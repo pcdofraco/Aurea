@@ -266,22 +266,54 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* ── MODAL ── */
 #modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:none;align-items:flex-end;padding-bottom:var(--sb);}
 #modal-overlay.open{display:flex;}
-.modal{width:100%;max-width:640px;margin:0 auto;border-radius:20px 20px 0 0;background:rgba(16,16,16,0.98);border-top:1px solid rgba(255,255,255,0.13);padding:20px 20px calc(20px + var(--sb));animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);}
+.modal{width:100%;max-width:640px;margin:0 auto;border-radius:20px 20px 0 0;background:rgba(16,16,16,0.98);border-top:1px solid rgba(255,255,255,0.1);padding:16px 22px calc(28px + var(--sb));animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-handle{width:30px;height:3px;background:rgba(255,255,255,0.13);border-radius:2px;margin:0 auto 18px;}
-.modal-title{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;color:var(--t2);text-transform:uppercase;margin-bottom:18px;}
-.m-input{width:100%;padding:13px 15px;border-radius:var(--r2);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--t1);font-family:var(--sans);font-size:15px;outline:none;margin-bottom:11px;transition:border-color 0.2s;}
-.m-input:focus{border-color:rgba(255,255,255,0.28);}
-.m-input::placeholder{color:var(--t4);}
-.m-label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--t3);text-transform:uppercase;margin-bottom:8px;}
-.m-days{display:flex;gap:5px;margin-bottom:15px;}
-.day-pill{flex:1;padding:8px 0;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);font-family:var(--mono);font-size:clamp(9px,2vw,10px);color:var(--t3);text-align:center;cursor:pointer;transition:all 0.15s;user-select:none;-webkit-user-select:none;}
-.day-pill.on{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.28);color:var(--t1);}
-.m-actions{display:flex;gap:8px;margin-top:4px;}
-.m-confirm{flex:1;padding:13px;border-radius:var(--r2);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;border:none;}
-.m-cancel{padding:13px 18px;border-radius:var(--r2);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;border:none;}
-.m-delete{width:100%;padding:13px;border-radius:var(--r2);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid rgba(255,100,100,0.2);background:rgba(255,80,80,0.05);color:rgba(255,120,120,0.65);font-family:var(--mono);cursor:pointer;margin-bottom:10px;}
-.m-delete:active{background:rgba(255,80,80,0.12);}
+.modal-handle{width:28px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;margin:0 auto 0;}
+
+/* modal header row: title + X */
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 0 20px;}
+.modal-title{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--t3);text-transform:uppercase;}
+.modal-close{background:none;border:none;color:var(--t3);font-size:18px;line-height:1;cursor:pointer;padding:2px 0 2px 12px;transition:color 0.15s;}
+.modal-close:active{color:var(--t1);}
+
+/* each field row */
+.m-field{margin-bottom:20px;}
+.m-field-label{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;color:var(--t4);text-transform:uppercase;margin-bottom:8px;}
+
+/* flat underline inputs */
+.m-flat{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.09);padding:7px 0;font-family:var(--sans);font-size:15px;color:var(--t1);outline:none;transition:border-color 0.2s;}
+.m-flat:focus{border-bottom-color:rgba(255,255,255,0.28);}
+.m-flat::placeholder{color:var(--t4);}
+
+/* date */
+.m-flat[type=date]{font-family:var(--mono);font-size:13px;color:var(--t2);color-scheme:dark;}
+
+/* color dots row */
+.m-colors{display:flex;gap:11px;align-items:center;}
+.m-color-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;flex-shrink:0;}
+.m-color-dot.sel{transform:scale(1.3);box-shadow:0 0 0 2px rgba(255,255,255,0.28);}
+
+/* option pills (prioridade, repetição) */
+.m-pills{display:flex;gap:5px;flex-wrap:wrap;}
+.m-pill{padding:5px 13px;border-radius:20px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.09);color:var(--t3);cursor:pointer;transition:all 0.15s;user-select:none;}
+.m-pill.sel{border-color:rgba(255,255,255,0.32);color:var(--t1);}
+
+/* days row */
+.m-days{display:flex;gap:5px;margin-top:2px;}
+.day-pill{flex:1;padding:7px 0;border-radius:7px;border:1px solid rgba(255,255,255,0.09);background:none;font-family:var(--mono);font-size:9px;color:var(--t4);text-align:center;cursor:pointer;transition:all 0.15s;user-select:none;-webkit-user-select:none;}
+.day-pill.on{border-color:rgba(255,255,255,0.26);color:var(--t1);}
+
+/* save button — text only, no box */
+.m-save{display:block;width:100%;background:none;border:none;font-family:var(--mono);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--t2);cursor:pointer;padding:14px 0 4px;text-align:center;transition:color 0.15s;}
+.m-save:active{color:var(--t1);}
+
+/* delete link */
+.m-delete{display:block;width:100%;background:none;border:none;font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,90,80,0.4);cursor:pointer;padding:12px 0 0;text-align:center;transition:color 0.15s;}
+.m-delete:active{color:rgba(255,90,80,0.8);}
+
+/* label inside tag row */
+.m-tag-row{display:flex;align-items:center;gap:12px;}
+.m-tag-row .m-flat{flex:1;}
 
 /* ── FILTER BAR ── */
 .filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
@@ -289,27 +321,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .filter-chip.act{border-color:rgba(255,255,255,0.35);color:var(--t1);background:rgba(255,255,255,0.06);}
 .filter-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;flex-shrink:0;}
 
-/* ── MODAL EXTRAS ── */
-.m-section{margin-bottom:18px;}
-.m-row-label{font-family:var(--mono);font-size:8px;letter-spacing:0.16em;color:var(--t3);text-transform:uppercase;margin-bottom:9px;}
-/* tag input */
-.m-tag-wrap{display:flex;gap:7px;align-items:center;}
-.m-tag-input{flex:1;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.1);padding:6px 0;font-family:var(--sans);font-size:14px;color:var(--t1);outline:none;transition:border-color 0.2s;}
-.m-tag-input:focus{border-bottom-color:rgba(255,255,255,0.3);}
-.m-tag-input::placeholder{color:var(--t4);}
-/* color dots */
-.m-colors{display:flex;gap:10px;align-items:center;}
-.m-color-dot{width:18px;height:18px;border-radius:50%;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;flex-shrink:0;border:2px solid transparent;}
-.m-color-dot.sel{transform:scale(1.25);box-shadow:0 0 0 2px rgba(255,255,255,0.3);}
-/* repeat pills */
-.m-repeat-row{display:flex;gap:5px;flex-wrap:wrap;}
-.m-repeat-pill{padding:6px 12px;border-radius:20px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.1);color:var(--t3);cursor:pointer;transition:all 0.15s;}
-.m-repeat-pill.sel{border-color:rgba(255,255,255,0.35);color:var(--t1);background:rgba(255,255,255,0.06);}
-/* date input */
-.m-date-input{background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.1);padding:6px 0;font-family:var(--mono);font-size:13px;color:var(--t2);outline:none;transition:border-color 0.2s;width:100%;color-scheme:dark;}
-.m-date-input:focus{border-bottom-color:rgba(255,255,255,0.3);}
-/* divider line inside modal */
-.m-divider{height:1px;background:rgba(255,255,255,0.06);margin:4px 0 18px;}
+/* ── MODAL EXTRAS kept: filter bar, item dots, due badges ── */
 /* item color dot on list */
 .item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px;}
 /* item tag pill — repeat type */
@@ -318,6 +330,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .item-due{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,0.05);color:var(--t3);flex-shrink:0;}
 .item-due.soon{color:rgba(255,180,60,0.9);}
 .item-due.over{color:rgba(255,90,80,0.85);}
+
+/* ── FINANCE ANIMATIONS ── */
+@keyframes countUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fin-hero-val.animating{animation:countUp 0.6s cubic-bezier(0.34,1.2,0.64,1);}
+.fin-split-val.animating{animation:countUp 0.5s cubic-bezier(0.34,1.2,0.64,1);}
+@keyframes barGrow{from{width:0}to{}}
+.cat-bar{animation:barGrow 0.7s cubic-bezier(0.34,1.2,0.64,1);}
 
 /* TOAST */
 #toast{position:fixed;top:calc(var(--st) + 14px);left:50%;transform:translateX(-50%) translateY(-120%);border-radius:30px;padding:9px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;background:rgba(255,255,255,0.93);color:#0d0d0d;font-weight:700;z-index:999;pointer-events:none;transition:transform 0.4s cubic-bezier(0.34,1.4,0.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
@@ -484,7 +503,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="modal-overlay" onclick="overlayClose(event)">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="m-title">—</div>
+    <div class="modal-hdr">
+      <div class="modal-title" id="m-title">—</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
     <div id="m-body"></div>
   </div>
 </div>
@@ -538,7 +560,7 @@ function setTab(name,label){
   document.getElementById('sec-'+name).classList.add('active');
   document.getElementById('di-'+name).classList.add('act');
   updateRing();
-  if(name==='financas')renderFinance();
+  if(name==='financas')renderFinance(true);
   else if(name==='habitos'){renderHabits();renderHabitFilters();}
   else if(name==='tarefas'){renderTasks();renderTaskFilters();}
   else if(name==='stats')renderStats();
@@ -762,17 +784,34 @@ function fmtShort(n){
   if(n>=1000)return 'R$ '+(n/1000).toFixed(1).replace('.',',')+'k';
   return 'R$ '+Math.round(n);
 }
-function renderFinance(){
+function animateCount(el,target,prefix,suffix,duration){
+  const start=Date.now(),from=0;
+  el.classList.add('animating');
+  const tick=()=>{
+    const p=Math.min(1,(Date.now()-start)/duration);
+    const ease=1-Math.pow(1-p,3);
+    const val=from+(target-from)*ease;
+    el.innerHTML=prefix+fmt(val)+suffix;
+    if(p<1)requestAnimationFrame(tick);
+    else{el.innerHTML=prefix+fmt(target)+suffix;el.classList.remove('animating');}
+  };
+  requestAnimationFrame(tick);
+}
+function renderFinance(animate){
   const ins=S.transactions.filter(t=>t.type==='in').reduce((a,t)=>a+t.amount,0);
   const outs=S.transactions.filter(t=>t.type==='out').reduce((a,t)=>a+t.amount,0);
   const total=ins-outs,avail=S.available||0,saving=Math.max(0,total-avail);
 
   // hero
   const absTotal=Math.abs(total);
-  const totalFormatted=fmt(absTotal);
-  const [totalIntPart,totalDecPart]=totalFormatted.split(',');
   const heroEl=document.getElementById('fin-total-display');
-  heroEl.innerHTML=`<span style="font-size:0.38em;font-weight:400;color:var(--t3);vertical-align:super;margin-right:2px;letter-spacing:0">R$</span>${total<0?'-':''}${totalIntPart}<span style="font-size:0.38em;color:var(--t3);font-weight:300">,${totalDecPart||'00'}</span>`;
+  if(animate){
+    animateCount(heroEl,absTotal,`<span style="font-size:0.38em;font-weight:400;color:var(--t3);vertical-align:super;margin-right:2px;letter-spacing:0">R$</span>${total<0?'-':''}`,``,700);
+  }else{
+    const totalFormatted=fmt(absTotal);
+    const [tip,tdp]=totalFormatted.split(',');
+    heroEl.innerHTML=`<span style="font-size:0.38em;font-weight:400;color:var(--t3);vertical-align:super;margin-right:2px;letter-spacing:0">R$</span>${total<0?'-':''}${tip}<span style="font-size:0.38em;color:var(--t3);font-weight:300">,${tdp||'00'}</span>`;
+  }
 
   // bank tags
   const bankTags=document.getElementById('bank-tags-list');
@@ -791,8 +830,18 @@ function renderFinance(){
   });
 
   // receita/despesas
-  document.getElementById('fin-in').textContent=fmtShort(ins);
-  document.getElementById('fin-out').textContent=fmtShort(outs);
+  const inEl=document.getElementById('fin-in'),outEl=document.getElementById('fin-out');
+  if(animate){
+    inEl.classList.add('animating');outEl.classList.add('animating');
+    let p=0;const dur=600,t0=Date.now();
+    const tick=()=>{p=Math.min(1,(Date.now()-t0)/dur);const e=1-Math.pow(1-p,3);
+      inEl.textContent=fmtShort(ins*e);outEl.textContent=fmtShort(outs*e);
+      if(p<1)requestAnimationFrame(tick);
+      else{inEl.textContent=fmtShort(ins);outEl.textContent=fmtShort(outs);inEl.classList.remove('animating');outEl.classList.remove('animating');}
+    };requestAnimationFrame(tick);
+  }else{
+    inEl.textContent=fmtShort(ins);outEl.textContent=fmtShort(outs);
+  }
   // delta vs last month placeholder
   const prevIns=ins*0.88,prevOuts=outs*1.08;
   const dIn=ins&&prevIns?Math.round(((ins-prevIns)/prevIns)*100):null;
@@ -915,28 +964,33 @@ function openModal(type,editId){
     if(h){mDays=[...(h.days||[0,1,2,3,4,5,6])];mColor=h.color||TAG_COLORS[0];mRepeat=h.repeat||'daily';}
     title.textContent=isEdit?'Editar hábito':'Novo hábito';
     body.innerHTML=`
-      <input class="m-input" id="m-name" placeholder="Nome do hábito" autocomplete="off" value="${h?h.name:''}">
-      <div class="m-divider"></div>
-      <div class="m-section">
-        <div class="m-row-label">Tag</div>
-        <div class="m-tag-wrap">
-          <input class="m-tag-input" id="m-tag" placeholder="ex: saúde, foco…" value="${h&&h.tag?h.tag:''}">
+      <div class="m-field">
+        <input class="m-flat" id="m-name" placeholder="Nome do hábito" autocomplete="off" value="${h?h.name:''}">
+      </div>
+      <div class="m-field">
+        <div class="m-field-label">Tag</div>
+        <div class="m-tag-row">
+          <input class="m-flat" id="m-tag" placeholder="ex: saúde, foco…" value="${h&&h.tag?h.tag:''}">
           <div class="m-colors" id="m-colors"></div>
         </div>
       </div>
-      <div class="m-section">
-        <div class="m-row-label">Repetição</div>
-        <div class="m-repeat-row" id="m-repeat-row"></div>
+      <div class="m-field">
+        <div class="m-field-label">Prioridade</div>
+        <div class="m-pills">
+          <div class="m-pill${!h||h.priority!=='alta'?' sel':''}" onclick="selectPill(this)">Normal</div>
+          <div class="m-pill${h&&h.priority==='alta'?' sel':''}" onclick="selectPill(this)">Alta</div>
+        </div>
       </div>
-      <div class="m-section" id="m-days-section">
-        <div class="m-row-label">Dias ativos</div>
+      <div class="m-field">
+        <div class="m-field-label">Repetição</div>
+        <div class="m-pills" id="m-repeat-row"></div>
+      </div>
+      <div class="m-field" id="m-days-section" style="display:none">
+        <div class="m-field-label">Dias</div>
         <div class="m-days" id="m-days-row"></div>
       </div>
-      ${isEdit?`<button class="m-delete" onclick="deleteItem('habit')">Excluir hábito</button>`:''}
-      <div class="m-actions">
-        <button class="m-cancel btn-3d" onclick="closeModal()">Cancelar</button>
-        <button class="m-confirm btn-3d" onclick="saveHabit()">${isEdit?'Salvar':'Criar'}</button>
-      </div>`;
+      ${isEdit?`<button class="m-delete" onclick="deleteItem('habit')">excluir hábito</button>`:''}
+      <button class="m-save" onclick="saveHabit()">${isEdit?'salvar':'criar hábito'}</button>`;
     renderMColors();renderMRepeat();renderMDays();
 
   }else if(type==='task'){
@@ -944,31 +998,29 @@ function openModal(type,editId){
     if(t){mColor=t.color||TAG_COLORS[0];}
     title.textContent=isEdit?'Editar tarefa':'Nova tarefa';
     body.innerHTML=`
-      <input class="m-input" id="m-name" placeholder="Descrição da tarefa" autocomplete="off" value="${t?t.name:''}">
-      <div class="m-divider"></div>
-      <div class="m-section">
-        <div class="m-row-label">Tag</div>
-        <div class="m-tag-wrap">
-          <input class="m-tag-input" id="m-tag" placeholder="ex: trabalho, pessoal…" value="${t&&t.tag?t.tag:''}">
+      <div class="m-field">
+        <input class="m-flat" id="m-name" placeholder="Descrição da tarefa" autocomplete="off" value="${t?t.name:''}">
+      </div>
+      <div class="m-field">
+        <div class="m-field-label">Tag</div>
+        <div class="m-tag-row">
+          <input class="m-flat" id="m-tag" placeholder="ex: trabalho, pessoal…" value="${t&&t.tag?t.tag:''}">
           <div class="m-colors" id="m-colors"></div>
         </div>
       </div>
-      <div class="m-section">
-        <div class="m-row-label">Prioridade</div>
-        <div class="m-repeat-row">
-          <div class="m-repeat-pill${!t||t.priority==='normal'?' sel':''}" onclick="selectPrio(this,'normal')">Normal</div>
-          <div class="m-repeat-pill${t&&t.priority==='alta'?' sel':''}" onclick="selectPrio(this,'alta')">Alta</div>
+      <div class="m-field">
+        <div class="m-field-label">Prioridade</div>
+        <div class="m-pills">
+          <div class="m-pill${!t||t.priority!=='alta'?' sel':''}" onclick="selectPill(this)">Normal</div>
+          <div class="m-pill${t&&t.priority==='alta'?' sel':''}" onclick="selectPill(this)">Alta</div>
         </div>
       </div>
-      <div class="m-section">
-        <div class="m-row-label">Data limite <span style="color:var(--t4);font-size:7px">(opcional)</span></div>
-        <input class="m-date-input" id="m-due" type="date" value="${t&&t.due?t.due:''}">
+      <div class="m-field">
+        <div class="m-field-label">Data limite <span style="font-size:7px;color:var(--t4)">opcional</span></div>
+        <input class="m-flat" id="m-due" type="date" value="${t&&t.due?t.due:''}">
       </div>
-      ${isEdit?`<button class="m-delete" onclick="deleteItem('task')">Excluir tarefa</button>`:''}
-      <div class="m-actions">
-        <button class="m-cancel btn-3d" onclick="closeModal()">Cancelar</button>
-        <button class="m-confirm btn-3d" onclick="saveTask()">${isEdit?'Salvar':'Criar'}</button>
-      </div>`;
+      ${isEdit?`<button class="m-delete" onclick="deleteItem('task')">excluir tarefa</button>`:''}
+      <button class="m-save" onclick="saveTask()">${isEdit?'salvar':'criar tarefa'}</button>`;
     renderMColors();
 
   }else{
@@ -977,14 +1029,18 @@ function openModal(type,editId){
     const bankOpts=BANKS.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
     const catOpts=CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
     body.innerHTML=`
-      <input class="m-input" id="m-name" placeholder="${isIn?'Ex: Salário, Freelance':'Ex: Mercado, Aluguel'}" autocomplete="off">
-      <input class="m-input" id="m-amount" type="number" placeholder="Valor (R$)" min="0" step="0.01">
-      <select class="m-input" id="m-bank" style="appearance:none;cursor:pointer"><option value="">Banco / Carteira</option>${bankOpts}</select>
-      ${!isIn?`<select class="m-input" id="m-cat" style="appearance:none;cursor:pointer"><option value="">Categoria</option>${catOpts}</select>`:''}
-      <div class="m-actions">
-        <button class="m-cancel btn-3d" onclick="closeModal()">Cancelar</button>
-        <button class="m-confirm btn-3d" onclick="saveFinance('${isIn?'in':'out'}')">${isIn?'Adicionar':'Registrar'}</button>
-      </div>`;
+      <div class="m-field">
+        <input class="m-flat" id="m-name" placeholder="${isIn?'Ex: Salário, Freelance':'Ex: Mercado, Aluguel'}" autocomplete="off">
+      </div>
+      <div class="m-field">
+        <input class="m-flat" id="m-amount" type="number" placeholder="Valor (R$)" min="0" step="0.01">
+      </div>
+      <div class="m-field">
+        <div class="m-field-label">Banco</div>
+        <select class="m-flat" id="m-bank" style="appearance:none;cursor:pointer"><option value="">Selecionar…</option>${bankOpts}</select>
+      </div>
+      ${!isIn?`<div class="m-field"><div class="m-field-label">Categoria</div><select class="m-flat" id="m-cat" style="appearance:none;cursor:pointer"><option value="">Selecionar…</option>${catOpts}</select></div>`:''}
+      <button class="m-save" onclick="saveFinance('${isIn?'in':'out'}')">${isIn?'adicionar entrada':'registrar saída'}</button>`;
   }
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(()=>{const i=document.getElementById('m-name');if(i)i.focus();},350);
@@ -1006,7 +1062,7 @@ function renderMRepeat(){
   wrap.innerHTML='';
   REPEAT_TYPES.forEach(r=>{
     const p=document.createElement('div');
-    p.className='m-repeat-pill'+(mRepeat===r.id?' sel':'');
+    p.className='m-pill'+(mRepeat===r.id?' sel':'');
     p.textContent=r.label;
     p.addEventListener('click',()=>{
       mRepeat=r.id;
@@ -1022,8 +1078,8 @@ function renderMRepeat(){
   if(ds)ds.style.display=(mRepeat==='custom')?'block':'none';
   renderMDays();
 }
-function selectPrio(el,val){
-  el.closest('.m-repeat-row').querySelectorAll('.m-repeat-pill').forEach(p=>p.classList.remove('sel'));
+function selectPill(el){
+  el.closest('.m-pills').querySelectorAll('.m-pill').forEach(p=>p.classList.remove('sel'));
   el.classList.add('sel');
 }
 function renderMDays(){
@@ -1049,16 +1105,18 @@ function deleteItem(type){
 function saveHabit(){
   const name=(document.getElementById('m-name').value||'').trim();if(!name)return;
   const tag=(document.getElementById('m-tag').value||'').trim().toLowerCase();
+  const prioEl=document.querySelector('#m-body .m-pills .m-pill.sel');
+  const priority=prioEl&&prioEl.textContent.trim()==='Alta'?'alta':'normal';
   const days=mRepeat==='daily'?[0,1,2,3,4,5,6]:mRepeat==='once'?[]:mDays;
-  if(mEditId){const h=S.habits.find(x=>x.id===mEditId);if(h){h.name=name;h.tag=tag;h.color=mColor;h.repeat=mRepeat;h.days=[...days];}}
-  else S.habits.push({id:Date.now(),name,tag,color:mColor,repeat:mRepeat,days:[...days],streak:0,done:{}});
+  if(mEditId){const h=S.habits.find(x=>x.id===mEditId);if(h){h.name=name;h.tag=tag;h.color=mColor;h.repeat=mRepeat;h.priority=priority;h.days=[...days];}}
+  else S.habits.push({id:Date.now(),name,tag,color:mColor,repeat:mRepeat,priority,days:[...days],streak:0,done:{}});
   save();closeModal();renderHabits();renderHabitFilters();updateRing();
 }
 function saveTask(){
   const name=(document.getElementById('m-name').value||'').trim();if(!name)return;
   const tag=(document.getElementById('m-tag').value||'').trim().toLowerCase();
-  const prioEl=document.querySelector('#m-body .m-repeat-pill.sel');
-  const prio=prioEl?prioEl.textContent.toLowerCase()==='alta'?'alta':'normal':'normal';
+  const prioEl=document.querySelector('#m-body .m-pills .m-pill.sel');
+  const prio=prioEl&&prioEl.textContent.trim()==='Alta'?'alta':'normal';
   const due=document.getElementById('m-due').value||null;
   if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.tag=tag;t.color=mColor;t.priority=prio;t.due=due;}}
   else S.tasks.push({id:Date.now(),name,tag,color:mColor,priority:prio,due,done:false});
@@ -1073,7 +1131,7 @@ function saveFinance(type){
   const bank=bankEl?bankEl.value||'outro':'outro';
   const cat=catEl?catEl.value||'outros':null;
   S.transactions.push({id:Date.now(),name,amount,type,bank,cat,date:new Date().toLocaleDateString('pt-BR')});
-  save();closeModal();renderFinance();addXP(XP_F,null);showToast('+'+XP_F+' XP');updateRing();
+  save();closeModal();renderFinance(true);addXP(XP_F,null);showToast('+'+XP_F+' XP');updateRing();
 }
 document.addEventListener('keydown',e=>{
   if(e.key!=='Enter')return;
