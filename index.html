@@ -393,17 +393,18 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 }
 
 /* ── DRAG & DROP ── */
+.task-list-wrap{user-select:none;-webkit-user-select:none;}
 .list-item{touch-action:pan-y;}
 .list-item.drag-active{
-  opacity:0.92;
-  background:rgba(255,255,255,0.04);
+  opacity:0.95;
+  background:rgba(255,255,255,0.05);
   border-radius:8px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.55);
-  z-index:50;
-  transition:box-shadow 0.15s;
+  box-shadow:0 12px 40px rgba(0,0,0,0.7);
+  z-index:200;
 }
-.list-item.drag-placeholder{
-  opacity:0.22;
+/* transição suave quando as demais se movem */
+.list-item.drag-sibling{
+  transition:transform 0.18s cubic-bezier(0.34,1.1,0.64,1);
 }
 
 /* ── FAB FLUTUANTE ── */
@@ -1288,130 +1289,206 @@ function updateFab(){
   else{fab.classList.add('hidden');}
 }
 
-/* ── DRAG REAL (sem fantasma — o item se move de verdade) ── */
+/* ── DRAG REAL — item se move, demais abrem espaço ── */
 function initDrag(container){
-  let dragged=null,startY=0,startTop=0,origIdx=0,holdTimer=null,holding=false;
+  let dragged=null,draggedH=0,startY=0,currentY=0,holdTimer=null,active=false,insertBefore=null;
 
-  function getItems(){return [...container.querySelectorAll('.list-item[data-id]')];}
+  function getItems(){
+    return [...container.querySelectorAll('.list-item[data-id]')];
+  }
 
-  function getClientY(e){return e.touches?e.touches[0].clientY:e.clientY;}
+  function getClientY(e){
+    return e.touches?e.touches[0].clientY:e.clientY;
+  }
 
-  function startDrag(e,row){
-    if(e.cancelable)e.preventDefault();
-    holding=true;
+  function beginDrag(e, row){
+    active=true;
     dragged=row;
-    const items=getItems();
-    origIdx=items.indexOf(row);
+    draggedH=row.offsetHeight;
     startY=getClientY(e);
-    startTop=row.getBoundingClientRect().top;
+    currentY=startY;
 
-    // tira do fluxo e posiciona fixo no mesmo lugar visualmente
+    // fixa o item visualmente no lugar mas tira do fluxo
     const rect=row.getBoundingClientRect();
-    const w=row.offsetWidth,h=row.offsetHeight;
-    row.style.cssText=`position:fixed;top:${rect.top}px;left:${rect.left}px;width:${w}px;height:${h}px;z-index:200;margin:0;transition:box-shadow 0.15s;`;
+    row.style.cssText=`
+      position:fixed;
+      top:${rect.top}px;
+      left:${rect.left}px;
+      width:${rect.width}px;
+      height:${draggedH}px;
+      z-index:200;
+      margin:0;
+      pointer-events:none;
+    `;
     row.classList.add('drag-active');
 
-    // placeholder invisível do mesmo tamanho para manter espaço
-    const ph=document.createElement('div');
-    ph.className='drag-ph';
-    ph.style.cssText=`height:${h}px;opacity:0;pointer-events:none;`;
-    ph.dataset.ph='1';
-    row.parentNode.insertBefore(ph,row.nextSibling);
+    // adiciona classe de transição nas irmãs
+    getItems().forEach(r=>{ if(r!==dragged) r.classList.add('drag-sibling'); });
 
     navigator.vibrate&&navigator.vibrate(25);
+    shiftSiblings();
+  }
+
+  // desloca as irmãs para abrir/fechar espaço em tempo real
+  function shiftSiblings(){
+    if(!dragged)return;
+    const items=getItems();
+    const draggedOrigIdx=items.indexOf(dragged); // posição DOM atual (fixo, não muda)
+
+    // centro vertical do item arrastado
+    const dragTop=parseFloat(dragged.style.top);
+    const dragMid=dragTop+draggedH/2;
+
+    // achar onde inserir: qual item está sendo passado por cima
+    insertBefore=null;
+    let insertIdx=items.length; // padrão: final
+
+    for(let i=0;i<items.length;i++){
+      const r=items[i];
+      if(r===dragged)continue;
+      const b=r.getBoundingClientRect();
+      // usa posição sem transform para calcular posição original
+      const origTop=b.top - (r._shift||0);
+      const origMid=origTop+b.height/2;
+      if(dragMid<origMid){
+        insertBefore=r;
+        insertIdx=i;
+        break;
+      }
+    }
+
+    // aplica deslocamento nas irmãs
+    let slotIdx=insertBefore ? items.indexOf(insertBefore) : items.length;
+    // se inserir antes de um item que vem depois do arrastado → shift para baixo
+    // se inserir antes de um item que vem antes do arrastado → shift para cima
+
+    items.forEach((r,i)=>{
+      if(r===dragged)return;
+      let shift=0;
+      // determine posição original do item (sem dragged)
+      const origI = i > items.indexOf(dragged) ? i-1 : i;
+      if(origI>=slotIdx && i>items.indexOf(dragged)){
+        shift=draggedH; // move para baixo (abre espaço)
+      }else if(origI<slotIdx && i<items.indexOf(dragged)){
+        shift=-draggedH; // move para cima
+      }
+      r._shift=shift;
+      r.style.transform=shift?`translateY(${shift}px)`:'';
+    });
   }
 
   function moveDrag(e){
-    if(!dragged)return;
+    if(!active||!dragged)return;
     if(e.cancelable)e.preventDefault();
     const y=getClientY(e);
     const dy=y-startY;
-    dragged.style.top=(startTop+dy)+'px';
+    dragged.style.top=(parseFloat(dragged.style.top)+(y-currentY))+'px';
+    currentY=y;
+    shiftSiblings();
+  }
 
-    // reordenar placeholder em tempo real
+  function endDrag(){
+    if(!active||!dragged)return;
+    active=false;
+
+    // anima o item para a posição final (onde o placeholder abriu espaço)
+    // calcula para onde ele vai
     const items=getItems();
-    const mid=dragged.getBoundingClientRect().top+dragged.offsetHeight/2;
-    const ph=container.querySelector('.drag-ph');
+    const dragIdx=items.indexOf(dragged);
 
-    let best=null,bestDist=Infinity;
-    items.forEach(r=>{
-      const b=r.getBoundingClientRect();
-      const rMid=b.top+b.height/2;
-      const dist=Math.abs(mid-rMid);
-      if(dist<bestDist){bestDist=dist;best=r;}
-    });
-    if(best&&ph){
-      if(mid<best.getBoundingClientRect().top+best.offsetHeight/2){
-        container.insertBefore(ph,best);
+    // posição alvo: onde insertBefore está (com shift aplicado) ou fim
+    let targetTop;
+    if(insertBefore){
+      const ib=insertBefore.getBoundingClientRect();
+      const ibShift=insertBefore._shift||0;
+      targetTop=ib.top-ibShift; // posição original do insertBefore
+    }else{
+      // vai para o final
+      const last=items.filter(r=>r!==dragged).pop();
+      if(last){
+        const lb=last.getBoundingClientRect();
+        targetTop=lb.top+(last._shift||0)+last.offsetHeight;
       }else{
-        container.insertBefore(ph,best.nextSibling);
+        targetTop=parseFloat(dragged.style.top);
       }
     }
-  }
 
-  function endDrag(e){
-    if(!dragged)return;
-    const ph=container.querySelector('.drag-ph');
-    // anima de volta para a posição do placeholder
-    if(ph){
-      const phRect=ph.getBoundingClientRect();
-      dragged.style.transition='top 0.18s cubic-bezier(0.34,1.2,0.64,1)';
-      dragged.style.top=phRect.top+'px';
-      setTimeout(()=>{
-        // remove estilos inline, restaura posição no DOM
-        dragged.style.cssText='';
-        dragged.classList.remove('drag-active');
-        if(ph&&ph.parentNode)ph.parentNode.insertBefore(dragged,ph);
-        ph&&ph.remove();
-        // sincroniza S.tasks com a ordem visual
-        const newOrder=getItems().map(r=>parseInt(r.dataset.id));
-        S.tasks.sort((a,b)=>newOrder.indexOf(a.id)-newOrder.indexOf(b.id));
-        save();updateRing();
-        dragged=null;holding=false;
-      },190);
-    }else{
+    // anima até lá
+    dragged.style.transition='top 0.2s cubic-bezier(0.34,1.1,0.64,1)';
+    dragged.style.top=targetTop+'px';
+
+    // zera shifts das irmãs imediatamente (elas "viram" para posição real)
+    items.forEach(r=>{
+      if(r===dragged)return;
+      r.style.transition='none';
+      r.style.transform='';
+      r._shift=0;
+      r.classList.remove('drag-sibling');
+    });
+
+    setTimeout(()=>{
+      // restaura o item no DOM na nova posição
       dragged.style.cssText='';
+      dragged.style.transition='';
       dragged.classList.remove('drag-active');
-      dragged=null;holding=false;
-    }
+
+      // insere no DOM na posição correta
+      if(insertBefore){
+        container.insertBefore(dragged,insertBefore);
+      }else{
+        container.appendChild(dragged);
+      }
+
+      // sincroniza S.tasks com a nova ordem visual
+      const newOrder=getItems().map(r=>parseInt(r.dataset.id));
+      S.tasks.sort((a,b)=>{
+        const ai=newOrder.indexOf(a.id);
+        const bi=newOrder.indexOf(b.id);
+        if(ai===-1)return 1;if(bi===-1)return -1;
+        return ai-bi;
+      });
+      save();
+
+      dragged=null;insertBefore=null;
+    },210);
   }
 
-  // long-press para ativar (400ms)
+  // ── TOUCH ──
   container.addEventListener('touchstart',e=>{
     const row=e.target.closest('.list-item[data-id]');
-    if(!row)return;
-    holding=false;
-    holdTimer=setTimeout(()=>{startDrag(e,row);},400);
-  },{passive:true});
+    if(!row||e.target.closest('.chk-c,.edit-btn'))return;
+    // bloqueia seleção de texto
+    e.preventDefault();
+    holdTimer=setTimeout(()=>beginDrag(e,row),380);
+  },{passive:false});
 
   container.addEventListener('touchmove',e=>{
-    if(!holding){clearTimeout(holdTimer);return;}
+    if(!active){clearTimeout(holdTimer);return;}
     moveDrag(e);
   },{passive:false});
 
-  container.addEventListener('touchend',e=>{
+  container.addEventListener('touchend',()=>{
     clearTimeout(holdTimer);
-    if(holding)endDrag(e);
+    if(active)endDrag();
   },{passive:true});
 
-  container.addEventListener('touchcancel',e=>{
+  container.addEventListener('touchcancel',()=>{
     clearTimeout(holdTimer);
-    if(holding)endDrag(e);
+    if(active)endDrag();
   },{passive:true});
 
-  // mouse (desktop)
+  // ── MOUSE (desktop) ──
   container.addEventListener('mousedown',e=>{
     const row=e.target.closest('.list-item[data-id]');
     if(!row||e.target.closest('.chk-c,.edit-btn'))return;
-    holdTimer=setTimeout(()=>{startDrag(e,row);},300);
+    holdTimer=setTimeout(()=>beginDrag(e,row),300);
   });
-  window.addEventListener('mousemove',e=>{if(holding)moveDrag(e);});
-  window.addEventListener('mouseup',e=>{
+  window.addEventListener('mousemove',e=>{if(active)moveDrag(e);});
+  window.addEventListener('mouseup',()=>{
     clearTimeout(holdTimer);
-    if(holding)endDrag(e);
+    if(active)endDrag();
   });
 }
-
 load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
 </script>
 </body>
