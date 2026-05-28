@@ -393,16 +393,18 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 }
 
 /* ── DRAG & DROP ── */
-.list-item.dragging{
-  opacity:0.35;
-  background:rgba(255,255,255,0.03);
+.list-item{touch-action:pan-y;}
+.list-item.drag-active{
+  opacity:0.92;
+  background:rgba(255,255,255,0.04);
   border-radius:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.55);
+  z-index:50;
+  transition:box-shadow 0.15s;
 }
-.list-item.drag-over{
-  border-top:1px solid rgba(255,255,255,0.28);
+.list-item.drag-placeholder{
+  opacity:0.22;
 }
-.list-item[draggable]{cursor:grab;}
-.list-item[draggable]:active{cursor:grabbing;}
 
 /* ── FAB FLUTUANTE ── */
 #fab-wrap{
@@ -849,7 +851,6 @@ function renderTasks(){
     }
     const row=document.createElement('div');
     row.className='list-item';
-    row.draggable=true;
     row.dataset.id=t.id;
     const chkStyle=t.done
       ?`background:${dot};border-color:${dot};`
@@ -866,14 +867,9 @@ function renderTasks(){
       <button class="edit-btn" title="Editar">✎</button>`;
     row.querySelector('.chk-c').addEventListener('click',e=>{e.stopPropagation();toggleTask(t.id,row);});
     row.querySelector('.edit-btn').addEventListener('click',e=>{e.stopPropagation();openModal('task',t.id);});
-    row.addEventListener('dragstart',onDragStart);
-    row.addEventListener('dragover',onDragOver);
-    row.addEventListener('dragleave',onDragLeave);
-    row.addEventListener('drop',onDrop);
-    row.addEventListener('dragend',onDragEnd);
     el.appendChild(row);
   });
-  initTouchDrag(el);
+  initDrag(el);
 }
 function toggleTask(id,row){
   const t=S.tasks.find(x=>x.id===id);if(!t)return;
@@ -1292,91 +1288,128 @@ function updateFab(){
   else{fab.classList.add('hidden');}
 }
 
-/* ── DRAG & DROP (reordenar tarefas) ── */
-let dragSrc=null;
-function onDragStart(e){
-  dragSrc=this;
-  this.classList.add('dragging');
-  e.dataTransfer.effectAllowed='move';
-  e.dataTransfer.setData('text/plain',this.dataset.id);
-}
-function onDragOver(e){
-  e.preventDefault();e.dataTransfer.dropEffect='move';
-  if(this!==dragSrc)this.classList.add('drag-over');
-}
-function onDragLeave(){this.classList.remove('drag-over');}
-function onDrop(e){
-  e.preventDefault();e.stopPropagation();
-  this.classList.remove('drag-over');
-  if(!dragSrc||dragSrc===this)return;
-  const fromId=parseInt(dragSrc.dataset.id);
-  const toId=parseInt(this.dataset.id);
-  const fi=S.tasks.findIndex(x=>x.id===fromId);
-  const ti=S.tasks.findIndex(x=>x.id===toId);
-  if(fi<0||ti<0)return;
-  const [moved]=S.tasks.splice(fi,1);
-  S.tasks.splice(ti,0,moved);
-  save();renderTasks();
-}
-function onDragEnd(){
-  document.querySelectorAll('.list-item').forEach(r=>r.classList.remove('dragging','drag-over'));
-  dragSrc=null;
-}
+/* ── DRAG REAL (sem fantasma — o item se move de verdade) ── */
+function initDrag(container){
+  let dragged=null,startY=0,startTop=0,origIdx=0,holdTimer=null,holding=false;
 
-/* touch drag para mobile */
-function initTouchDrag(container){
-  let touchItem=null,clone=null,startY=0,itemH=0;
+  function getItems(){return [...container.querySelectorAll('.list-item[data-id]')];}
+
+  function getClientY(e){return e.touches?e.touches[0].clientY:e.clientY;}
+
+  function startDrag(e,row){
+    if(e.cancelable)e.preventDefault();
+    holding=true;
+    dragged=row;
+    const items=getItems();
+    origIdx=items.indexOf(row);
+    startY=getClientY(e);
+    startTop=row.getBoundingClientRect().top;
+
+    // tira do fluxo e posiciona fixo no mesmo lugar visualmente
+    const rect=row.getBoundingClientRect();
+    const w=row.offsetWidth,h=row.offsetHeight;
+    row.style.cssText=`position:fixed;top:${rect.top}px;left:${rect.left}px;width:${w}px;height:${h}px;z-index:200;margin:0;transition:box-shadow 0.15s;`;
+    row.classList.add('drag-active');
+
+    // placeholder invisível do mesmo tamanho para manter espaço
+    const ph=document.createElement('div');
+    ph.className='drag-ph';
+    ph.style.cssText=`height:${h}px;opacity:0;pointer-events:none;`;
+    ph.dataset.ph='1';
+    row.parentNode.insertBefore(ph,row.nextSibling);
+
+    navigator.vibrate&&navigator.vibrate(25);
+  }
+
+  function moveDrag(e){
+    if(!dragged)return;
+    if(e.cancelable)e.preventDefault();
+    const y=getClientY(e);
+    const dy=y-startY;
+    dragged.style.top=(startTop+dy)+'px';
+
+    // reordenar placeholder em tempo real
+    const items=getItems();
+    const mid=dragged.getBoundingClientRect().top+dragged.offsetHeight/2;
+    const ph=container.querySelector('.drag-ph');
+
+    let best=null,bestDist=Infinity;
+    items.forEach(r=>{
+      const b=r.getBoundingClientRect();
+      const rMid=b.top+b.height/2;
+      const dist=Math.abs(mid-rMid);
+      if(dist<bestDist){bestDist=dist;best=r;}
+    });
+    if(best&&ph){
+      if(mid<best.getBoundingClientRect().top+best.offsetHeight/2){
+        container.insertBefore(ph,best);
+      }else{
+        container.insertBefore(ph,best.nextSibling);
+      }
+    }
+  }
+
+  function endDrag(e){
+    if(!dragged)return;
+    const ph=container.querySelector('.drag-ph');
+    // anima de volta para a posição do placeholder
+    if(ph){
+      const phRect=ph.getBoundingClientRect();
+      dragged.style.transition='top 0.18s cubic-bezier(0.34,1.2,0.64,1)';
+      dragged.style.top=phRect.top+'px';
+      setTimeout(()=>{
+        // remove estilos inline, restaura posição no DOM
+        dragged.style.cssText='';
+        dragged.classList.remove('drag-active');
+        if(ph&&ph.parentNode)ph.parentNode.insertBefore(dragged,ph);
+        ph&&ph.remove();
+        // sincroniza S.tasks com a ordem visual
+        const newOrder=getItems().map(r=>parseInt(r.dataset.id));
+        S.tasks.sort((a,b)=>newOrder.indexOf(a.id)-newOrder.indexOf(b.id));
+        save();updateRing();
+        dragged=null;holding=false;
+      },190);
+    }else{
+      dragged.style.cssText='';
+      dragged.classList.remove('drag-active');
+      dragged=null;holding=false;
+    }
+  }
+
+  // long-press para ativar (400ms)
   container.addEventListener('touchstart',e=>{
-    const row=e.target.closest('.list-item[draggable]');
+    const row=e.target.closest('.list-item[data-id]');
     if(!row)return;
-    // precisa segurar 500ms
-    let held=false;
-    const t=setTimeout(()=>{
-      held=true;
-      touchItem=row;
-      itemH=row.offsetHeight;
-      startY=e.touches[0].clientY;
-      clone=row.cloneNode(true);
-      clone.style.cssText=`position:fixed;z-index:999;width:${row.offsetWidth}px;opacity:0.85;
-        top:${row.getBoundingClientRect().top}px;left:${row.getBoundingClientRect().left}px;
-        pointer-events:none;border-radius:8px;background:rgba(30,30,30,0.9);`;
-      document.body.appendChild(clone);
-      row.classList.add('dragging');
-      navigator.vibrate&&navigator.vibrate(30);
-    },480);
-    const cancel=()=>{if(!held)clearTimeout(t);};
-    row.addEventListener('touchend',cancel,{once:true});
-    row.addEventListener('touchmove',cancel,{once:true,passive:true});
+    holding=false;
+    holdTimer=setTimeout(()=>{startDrag(e,row);},400);
   },{passive:true});
 
   container.addEventListener('touchmove',e=>{
-    if(!touchItem||!clone)return;
-    e.preventDefault();
-    const y=e.touches[0].clientY;
-    clone.style.top=(clone.getBoundingClientRect().top+(y-startY))+'px';
-    startY=y;
-    // find target
-    const els=[...container.querySelectorAll('.list-item:not(.dragging)')];
-    els.forEach(r=>r.classList.remove('drag-over'));
-    const over=els.find(r=>{const b=r.getBoundingClientRect();return y>=b.top&&y<=b.bottom;});
-    if(over)over.classList.add('drag-over');
+    if(!holding){clearTimeout(holdTimer);return;}
+    moveDrag(e);
   },{passive:false});
 
   container.addEventListener('touchend',e=>{
-    if(!touchItem||!clone)return;
-    clone.remove();clone=null;
-    const over=container.querySelector('.list-item.drag-over');
-    if(over&&over!==touchItem){
-      const fromId=parseInt(touchItem.dataset.id);
-      const toId=parseInt(over.dataset.id);
-      const fi=S.tasks.findIndex(x=>x.id===fromId);
-      const ti=S.tasks.findIndex(x=>x.id===toId);
-      if(fi>=0&&ti>=0){const [m]=S.tasks.splice(fi,1);S.tasks.splice(ti,0,m);save();}
-    }
-    container.querySelectorAll('.list-item').forEach(r=>r.classList.remove('dragging','drag-over'));
-    touchItem=null;
-    renderTasks();
+    clearTimeout(holdTimer);
+    if(holding)endDrag(e);
   },{passive:true});
+
+  container.addEventListener('touchcancel',e=>{
+    clearTimeout(holdTimer);
+    if(holding)endDrag(e);
+  },{passive:true});
+
+  // mouse (desktop)
+  container.addEventListener('mousedown',e=>{
+    const row=e.target.closest('.list-item[data-id]');
+    if(!row||e.target.closest('.chk-c,.edit-btn'))return;
+    holdTimer=setTimeout(()=>{startDrag(e,row);},300);
+  });
+  window.addEventListener('mousemove',e=>{if(holding)moveDrag(e);});
+  window.addEventListener('mouseup',e=>{
+    clearTimeout(holdTimer);
+    if(holding)endDrag(e);
+  });
 }
 
 load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
