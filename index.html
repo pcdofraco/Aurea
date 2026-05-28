@@ -69,15 +69,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* LOGO small */
 .h-logo{font-family:var(--mono);font-size:clamp(10px,2.2vw,13px);letter-spacing:0.22em;color:var(--t2);font-weight:700;}
 
-/* PROGRESS RING */
-.prog-card{border-radius:var(--r);padding:10px 14px;flex-shrink:0;text-align:center;min-width:90px;}
-.pc-label{font-family:var(--mono);font-size:8px;letter-spacing:0.14em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;}
-.pc-ring-wrap{position:relative;width:48px;height:48px;margin:0 auto 5px;}
+/* PROGRESS RING — minimalista, sem caixa */
+.prog-card{flex-shrink:0;text-align:center;background:none;border:none;padding:0;}
+.pc-label{display:none;}
+.pc-ring-wrap{position:relative;width:36px;height:36px;margin:0 auto;}
 .pc-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
-.pc-ring-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:3;}
-.pc-ring-fill{fill:none;stroke:rgba(255,255,255,0.78);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 0.7s cubic-bezier(0.34,1.4,0.64,1);}
-.pc-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;}
-.pc-sub{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:0.05em;}
+.pc-ring-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:2.5;}
+.pc-ring-fill{fill:none;stroke:rgba(255,255,255,0.75);stroke-width:2.5;stroke-linecap:round;transition:stroke-dashoffset 0.7s cubic-bezier(0.34,1.4,0.64,1);}
+.pc-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--t2);}
+.pc-sub{display:none;}
 
 /* ── DRAWER OVERLAY ── */
 #drawer-overlay{
@@ -145,17 +145,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .drawer-stat-num{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--t1);}
 .drawer-stat-lbl{font-family:var(--mono);font-size:7px;letter-spacing:0.1em;color:var(--t3);text-transform:uppercase;margin-top:2px;}
 
-/* ── STATS BAR ── */
-#stats-bar{margin:0 clamp(16px,5vw,48px) clamp(8px,1.5vw,12px);border-radius:var(--r);flex-shrink:0;}
-.stats-inner{display:flex;align-items:center;padding:clamp(10px,2vw,16px) clamp(14px,3vw,24px);gap:0;}
-.stat-blk{padding-right:clamp(12px,2.5vw,22px);margin-right:clamp(12px,2.5vw,22px);border-right:1px solid var(--b2);flex-shrink:0;}
-.stat-num{font-family:var(--mono);font-size:clamp(16px,3.5vw,26px);font-weight:700;line-height:1;}
-.stat-lbl{font-family:var(--mono);font-size:clamp(7px,1.4vw,9px);letter-spacing:0.1em;color:var(--t3);margin-top:3px;text-transform:uppercase;}
-.xp-blk{flex:1;min-width:0;}
-.xp-lbl{font-family:var(--mono);font-size:clamp(7px,1.4vw,9px);letter-spacing:0.12em;color:var(--t3);margin-bottom:5px;text-transform:uppercase;}
-.xp-track{height:2px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-bottom:4px;}
-.xp-fill{height:100%;background:rgba(255,255,255,0.5);border-radius:2px;transition:width 0.6s ease;}
-.xp-txt{font-family:var(--mono);font-size:clamp(7px,1.4vw,9px);color:var(--t3);}
+/* ── STATS BAR ── (removido) */
 
 /* ── CONTENT ── */
 #content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 clamp(16px,5vw,48px) calc(24px + var(--sb));}
@@ -293,6 +283,42 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .m-delete{width:100%;padding:13px;border-radius:var(--r2);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid rgba(255,100,100,0.2);background:rgba(255,80,80,0.05);color:rgba(255,120,120,0.65);font-family:var(--mono);cursor:pointer;margin-bottom:10px;}
 .m-delete:active{background:rgba(255,80,80,0.12);}
 
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.filter-chip{padding:5px 11px;border-radius:20px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.1);color:var(--t3);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.filter-chip.act{border-color:rgba(255,255,255,0.35);color:var(--t1);background:rgba(255,255,255,0.06);}
+.filter-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;flex-shrink:0;}
+
+/* ── MODAL EXTRAS ── */
+.m-section{margin-bottom:18px;}
+.m-row-label{font-family:var(--mono);font-size:8px;letter-spacing:0.16em;color:var(--t3);text-transform:uppercase;margin-bottom:9px;}
+/* tag input */
+.m-tag-wrap{display:flex;gap:7px;align-items:center;}
+.m-tag-input{flex:1;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.1);padding:6px 0;font-family:var(--sans);font-size:14px;color:var(--t1);outline:none;transition:border-color 0.2s;}
+.m-tag-input:focus{border-bottom-color:rgba(255,255,255,0.3);}
+.m-tag-input::placeholder{color:var(--t4);}
+/* color dots */
+.m-colors{display:flex;gap:10px;align-items:center;}
+.m-color-dot{width:18px;height:18px;border-radius:50%;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;flex-shrink:0;border:2px solid transparent;}
+.m-color-dot.sel{transform:scale(1.25);box-shadow:0 0 0 2px rgba(255,255,255,0.3);}
+/* repeat pills */
+.m-repeat-row{display:flex;gap:5px;flex-wrap:wrap;}
+.m-repeat-pill{padding:6px 12px;border-radius:20px;font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.1);color:var(--t3);cursor:pointer;transition:all 0.15s;}
+.m-repeat-pill.sel{border-color:rgba(255,255,255,0.35);color:var(--t1);background:rgba(255,255,255,0.06);}
+/* date input */
+.m-date-input{background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.1);padding:6px 0;font-family:var(--mono);font-size:13px;color:var(--t2);outline:none;transition:border-color 0.2s;width:100%;color-scheme:dark;}
+.m-date-input:focus{border-bottom-color:rgba(255,255,255,0.3);}
+/* divider line inside modal */
+.m-divider{height:1px;background:rgba(255,255,255,0.06);margin:4px 0 18px;}
+/* item color dot on list */
+.item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px;}
+/* item tag pill — repeat type */
+.item-repeat{font-family:var(--mono);font-size:8px;letter-spacing:0.06em;color:var(--t4);margin-top:2px;}
+/* deadline badge */
+.item-due{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,0.05);color:var(--t3);flex-shrink:0;}
+.item-due.soon{color:rgba(255,180,60,0.9);}
+.item-due.over{color:rgba(255,90,80,0.85);}
+
 /* TOAST */
 #toast{position:fixed;top:calc(var(--st) + 14px);left:50%;transform:translateX(-50%) translateY(-120%);border-radius:30px;padding:9px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;background:rgba(255,255,255,0.93);color:#0d0d0d;font-weight:700;z-index:999;pointer-events:none;transition:transform 0.4s cubic-bezier(0.34,1.4,0.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);}
@@ -311,32 +337,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="h-center">
       <span class="h-logo">AUREA</span>
     </div>
-    <div class="prog-card glass">
+    <div class="prog-card">
       <div class="pc-label" id="pc-label">hoje</div>
       <div class="pc-ring-wrap">
         <svg viewBox="0 0 36 36"><circle class="pc-ring-bg" cx="18" cy="18" r="15.5"/><circle class="pc-ring-fill" id="ring-fill" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg>
         <div class="pc-pct" id="ring-pct">0%</div>
       </div>
       <div class="pc-sub" id="pc-sub">0 de 0</div>
-    </div>
-  </div>
-
-  <!-- STATS BAR -->
-  <div id="stats-bar" class="glass">
-    <div class="stats-inner">
-      <div class="stat-blk">
-        <div class="stat-num" id="s-streak">0</div>
-        <div class="stat-lbl">dias<br>seguidos</div>
-      </div>
-      <div class="stat-blk">
-        <div class="stat-num" id="s-xp">0</div>
-        <div class="stat-lbl">XP<br>total</div>
-      </div>
-      <div class="xp-blk">
-        <div class="xp-lbl" id="xp-lbl">Nível 1</div>
-        <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
-        <div class="xp-txt" id="xp-txt">0 / 200 XP</div>
-      </div>
     </div>
   </div>
 
@@ -348,6 +355,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="sec-title">Hábitos diários</div>
         <button class="add-btn btn-3d" onclick="openModal('habit',null)">+ Novo</button>
       </div>
+      <div class="filter-bar" id="habit-filters"></div>
       <div id="habits-list"></div>
     </div>
 
@@ -356,6 +364,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="sec-title">Lista de tarefas</div>
         <button class="add-btn btn-3d" onclick="openModal('task',null)">+ Nova</button>
       </div>
+      <div class="filter-bar" id="task-filters"></div>
       <div id="tasks-list"></div>
     </div>
 
@@ -486,8 +495,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 const DAYS=['D','S','T','Q','Q','S','S'];
 const DAY_FULL=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const XP_LVL=200,XP_H=25,XP_T=15,XP_F=10;
+const TAG_COLORS=['#ffffff','#a78bfa','#38bdf8','#4ade80','#fbbf24','#f87171','#fb923c'];
+const REPEAT_TYPES=[
+  {id:'daily',   label:'Todo dia'},
+  {id:'weekly',  label:'Semanal'},
+  {id:'custom',  label:'Dias custom'},
+  {id:'once',    label:'Uma vez'},
+];
 let S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[]};
-let mDays=[],mType='',mEditId=null,curTab='habitos',curPd='week';
+let mDays=[0,1,2,3,4,5,6],mType='',mEditId=null,mColor=TAG_COLORS[0],mRepeat='daily',curTab='habitos',curPd='week';
+let habitFilter='all',taskFilter='all';
 
 function save(){try{localStorage.setItem('aurea_v5',JSON.stringify(S));}catch(e){}}
 function load(){
@@ -522,8 +539,8 @@ function setTab(name,label){
   document.getElementById('di-'+name).classList.add('act');
   updateRing();
   if(name==='financas')renderFinance();
-  else if(name==='habitos')renderHabits();
-  else if(name==='tarefas')renderTasks();
+  else if(name==='habitos'){renderHabits();renderHabitFilters();}
+  else if(name==='tarefas'){renderTasks();renderTaskFilters();}
   else if(name==='stats')renderStats();
 }
 
@@ -536,11 +553,8 @@ function addXP(n,el){
 function updateXPBar(){
   const lvl=Math.floor(S.xp/XP_LVL)+1;
   const inLvl=S.xp%XP_LVL,pct=Math.round((inLvl/XP_LVL)*100);
-  document.getElementById('s-xp').textContent=S.xp;
-  document.getElementById('s-streak').textContent=S.streak||0;
-  document.getElementById('xp-fill').style.width=pct+'%';
-  document.getElementById('xp-lbl').textContent='Nível '+lvl;
-  document.getElementById('xp-txt').textContent=inLvl+' / '+XP_LVL+' XP';
+  // drawer only (stats bar removido)
+
   // drawer
   document.getElementById('d-xp-fill').style.width=pct+'%';
   document.getElementById('d-xp-lbl').textContent='Nível '+lvl;
@@ -595,22 +609,65 @@ function snapshotHistory(){
   save();
 }
 
+/* FILTERS */
+function renderHabitFilters(){
+  const wrap=document.getElementById('habit-filters');if(!wrap)return;
+  const tags=[...new Set(S.habits.map(h=>h.tag).filter(Boolean))];
+  wrap.innerHTML='';
+  if(!tags.length)return;
+  const all=document.createElement('div');
+  all.className='filter-chip'+(habitFilter==='all'?' act':'');
+  all.textContent='Todos';
+  all.addEventListener('click',()=>{habitFilter='all';renderHabits();renderHabitFilters();});
+  wrap.appendChild(all);
+  tags.forEach(tag=>{
+    const chip=document.createElement('div');
+    chip.className='filter-chip'+(habitFilter===tag?' act':'');
+    const col=S.habits.find(h=>h.tag===tag)?.color||'#fff';
+    chip.innerHTML=`<span class="filter-dot" style="background:${col}"></span>${tag}`;
+    chip.addEventListener('click',()=>{habitFilter=tag;renderHabits();renderHabitFilters();});
+    wrap.appendChild(chip);
+  });
+}
+function renderTaskFilters(){
+  const wrap=document.getElementById('task-filters');if(!wrap)return;
+  const tags=[...new Set(S.tasks.map(t=>t.tag).filter(Boolean))];
+  wrap.innerHTML='';
+  if(!tags.length)return;
+  const all=document.createElement('div');
+  all.className='filter-chip'+(taskFilter==='all'?' act':'');
+  all.textContent='Todos';
+  all.addEventListener('click',()=>{taskFilter='all';renderTasks();renderTaskFilters();});
+  wrap.appendChild(all);
+  tags.forEach(tag=>{
+    const chip=document.createElement('div');
+    chip.className='filter-chip'+(taskFilter===tag?' act':'');
+    const col=S.tasks.find(t=>t.tag===tag)?.color||'#fff';
+    chip.innerHTML=`<span class="filter-dot" style="background:${col}"></span>${tag}`;
+    chip.addEventListener('click',()=>{taskFilter=tag;renderTasks();renderTaskFilters();});
+    wrap.appendChild(chip);
+  });
+}
+
 /* HABITS */
 function renderHabits(){
   const el=document.getElementById('habits-list');
-  if(!S.habits.length){el.innerHTML='<div class="empty">Nenhum hábito ainda</div>';return;}
-  const today=new Date().toDateString(),dow=new Date().getDay();
+  const list=habitFilter==='all'?S.habits:S.habits.filter(h=>h.tag===habitFilter);
+  if(!list.length){el.innerHTML='<div class="empty">'+(S.habits.length?'Nenhum hábito com essa tag':'Nenhum hábito ainda')+'</div>';return;}
+  const today=new Date().toDateString();
   el.innerHTML='';
-  S.habits.forEach(h=>{
+  list.forEach(h=>{
     const done=h.done&&h.done[today];
-    const activeDays=h.days.map(i=>DAY_FULL[i]).join(', ');
+    const repeatLabel=REPEAT_TYPES.find(r=>r.id===h.repeat)?.label||'Todo dia';
+    const dot=h.color||TAG_COLORS[0];
     const row=document.createElement('div');
     row.className='list-item';
     row.innerHTML=`
       <div class="chk-c${done?' done':''}"></div>
+      <div class="item-dot" style="background:${dot}"></div>
       <div class="item-body">
         <div class="item-name${done?' done':''}">${h.name}</div>
-        <div class="item-meta">🔥 ${h.streak||0} dias · ${activeDays}</div>
+        <div class="item-meta">🔥 ${h.streak||0} · ${h.tag?'#'+h.tag+' · ':''}${repeatLabel}</div>
       </div>
       <button class="edit-btn" title="Editar">✎</button>`;
     row.querySelector('.chk-c').addEventListener('click',e=>{e.stopPropagation();toggleHabit(h.id,row);});
@@ -639,15 +696,31 @@ function toggleHabit(id,row){
 /* TASKS */
 function renderTasks(){
   const el=document.getElementById('tasks-list');
-  if(!S.tasks.length){el.innerHTML='<div class="empty">Nenhuma tarefa ainda</div>';return;}
+  const list=taskFilter==='all'?S.tasks:S.tasks.filter(t=>t.tag===taskFilter);
+  if(!list.length){el.innerHTML='<div class="empty">'+(S.tasks.length?'Nenhuma tarefa com essa tag':'Nenhuma tarefa ainda')+'</div>';return;}
   el.innerHTML='';
-  const pending=S.tasks.filter(t=>!t.done),done=S.tasks.filter(t=>t.done);
+  const today=new Date();today.setHours(0,0,0,0);
+  const pending=list.filter(t=>!t.done),done=list.filter(t=>t.done);
   [...pending,...done].forEach(t=>{
+    const dot=t.color||TAG_COLORS[0];
+    let dueBadge='';
+    if(t.due){
+      const d=new Date(t.due+'T00:00:00');
+      const diff=Math.round((d-today)/(1000*60*60*24));
+      const label=diff===0?'hoje':diff===1?'amanhã':diff<0?`${Math.abs(diff)}d atraso`:`${diff}d`;
+      const cls=diff<0?'over':diff<=2?'soon':'';
+      dueBadge=`<div class="item-due ${cls}">${label}</div>`;
+    }
     const row=document.createElement('div');
     row.className='list-item';
     row.innerHTML=`
       <div class="chk-s${t.done?' done':''}"></div>
-      <div class="item-body"><div class="item-name${t.done?' done':''}">${t.name}</div></div>
+      <div class="item-dot" style="background:${dot}"></div>
+      <div class="item-body">
+        <div class="item-name${t.done?' done':''}">${t.name}</div>
+        ${t.tag?`<div class="item-meta">#${t.tag}${t.priority==='alta'?' · alta':''}</div>`:(t.priority==='alta'?`<div class="item-meta">alta prioridade</div>`:'')}
+      </div>
+      ${dueBadge}
       <div class="item-tag${t.priority==='alta'?' high':''}">${t.priority||'normal'}</div>
       <button class="edit-btn" title="Editar">✎</button>`;
     row.querySelector('.chk-s').addEventListener('click',e=>{e.stopPropagation();toggleTask(t.id,row);});
@@ -832,37 +905,72 @@ function drawChart(svgId,lblId,data,labels,suffix){
 
 /* MODAL */
 function openModal(type,editId){
-  mType=type;mEditId=editId;mDays=[0,1,2,3,4,5,6];
+  mType=type;mEditId=editId;
+  mDays=[0,1,2,3,4,5,6];mColor=TAG_COLORS[0];mRepeat='daily';
   const title=document.getElementById('m-title'),body=document.getElementById('m-body');
   const isEdit=editId!==null;
+
   if(type==='habit'){
     const h=isEdit?S.habits.find(x=>x.id===editId):null;
-    if(h)mDays=[...h.days];
+    if(h){mDays=[...(h.days||[0,1,2,3,4,5,6])];mColor=h.color||TAG_COLORS[0];mRepeat=h.repeat||'daily';}
     title.textContent=isEdit?'Editar hábito':'Novo hábito';
     body.innerHTML=`
       <input class="m-input" id="m-name" placeholder="Nome do hábito" autocomplete="off" value="${h?h.name:''}">
-      <div class="m-label">Dias ativos</div>
-      <div class="m-days" id="m-days-row"></div>
+      <div class="m-divider"></div>
+      <div class="m-section">
+        <div class="m-row-label">Tag</div>
+        <div class="m-tag-wrap">
+          <input class="m-tag-input" id="m-tag" placeholder="ex: saúde, foco…" value="${h&&h.tag?h.tag:''}">
+          <div class="m-colors" id="m-colors"></div>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-row-label">Repetição</div>
+        <div class="m-repeat-row" id="m-repeat-row"></div>
+      </div>
+      <div class="m-section" id="m-days-section">
+        <div class="m-row-label">Dias ativos</div>
+        <div class="m-days" id="m-days-row"></div>
+      </div>
       ${isEdit?`<button class="m-delete" onclick="deleteItem('habit')">Excluir hábito</button>`:''}
       <div class="m-actions">
         <button class="m-cancel btn-3d" onclick="closeModal()">Cancelar</button>
         <button class="m-confirm btn-3d" onclick="saveHabit()">${isEdit?'Salvar':'Criar'}</button>
       </div>`;
-    renderMDays();
+    renderMColors();renderMRepeat();renderMDays();
+
   }else if(type==='task'){
     const t=isEdit?S.tasks.find(x=>x.id===editId):null;
+    if(t){mColor=t.color||TAG_COLORS[0];}
     title.textContent=isEdit?'Editar tarefa':'Nova tarefa';
     body.innerHTML=`
       <input class="m-input" id="m-name" placeholder="Descrição da tarefa" autocomplete="off" value="${t?t.name:''}">
-      <select class="m-input" id="m-prio" style="appearance:none;cursor:pointer">
-        <option value="normal"${t&&t.priority==='normal'?' selected':''}>Prioridade normal</option>
-        <option value="alta"${t&&t.priority==='alta'?' selected':''}>Prioridade alta</option>
-      </select>
+      <div class="m-divider"></div>
+      <div class="m-section">
+        <div class="m-row-label">Tag</div>
+        <div class="m-tag-wrap">
+          <input class="m-tag-input" id="m-tag" placeholder="ex: trabalho, pessoal…" value="${t&&t.tag?t.tag:''}">
+          <div class="m-colors" id="m-colors"></div>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-row-label">Prioridade</div>
+        <div class="m-repeat-row">
+          <div class="m-repeat-pill${!t||t.priority==='normal'?' sel':''}" onclick="selectPrio(this,'normal')">Normal</div>
+          <div class="m-repeat-pill${t&&t.priority==='alta'?' sel':''}" onclick="selectPrio(this,'alta')">Alta</div>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-row-label">Data limite <span style="color:var(--t4);font-size:7px">(opcional)</span></div>
+        <input class="m-date-input" id="m-due" type="date" value="${t&&t.due?t.due:''}">
+      </div>
       ${isEdit?`<button class="m-delete" onclick="deleteItem('task')">Excluir tarefa</button>`:''}
       <div class="m-actions">
         <button class="m-cancel btn-3d" onclick="closeModal()">Cancelar</button>
         <button class="m-confirm btn-3d" onclick="saveTask()">${isEdit?'Salvar':'Criar'}</button>
       </div>`;
+    renderMColors();
+
   }else{
     const isIn=type==='fin-in';
     title.textContent=isIn?'Nova entrada':'Nova saída';
@@ -881,6 +989,43 @@ function openModal(type,editId){
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(()=>{const i=document.getElementById('m-name');if(i)i.focus();},350);
 }
+
+function renderMColors(){
+  const wrap=document.getElementById('m-colors');if(!wrap)return;
+  wrap.innerHTML='';
+  TAG_COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='m-color-dot'+(mColor===c?' sel':'');
+    d.style.background=c;
+    d.addEventListener('click',()=>{mColor=c;renderMColors();});
+    wrap.appendChild(d);
+  });
+}
+function renderMRepeat(){
+  const wrap=document.getElementById('m-repeat-row');if(!wrap)return;
+  wrap.innerHTML='';
+  REPEAT_TYPES.forEach(r=>{
+    const p=document.createElement('div');
+    p.className='m-repeat-pill'+(mRepeat===r.id?' sel':'');
+    p.textContent=r.label;
+    p.addEventListener('click',()=>{
+      mRepeat=r.id;
+      if(r.id==='daily'){mDays=[0,1,2,3,4,5,6];}
+      else if(r.id==='once'){mDays=[];}
+      renderMRepeat();
+      const ds=document.getElementById('m-days-section');
+      if(ds)ds.style.display=(r.id==='custom')?'block':'none';
+    });
+    wrap.appendChild(p);
+  });
+  const ds=document.getElementById('m-days-section');
+  if(ds)ds.style.display=(mRepeat==='custom')?'block':'none';
+  renderMDays();
+}
+function selectPrio(el,val){
+  el.closest('.m-repeat-row').querySelectorAll('.m-repeat-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+}
 function renderMDays(){
   const wrap=document.getElementById('m-days-row');if(!wrap)return;
   wrap.innerHTML='';
@@ -898,21 +1043,26 @@ function deleteItem(type){
   if(type==='habit')S.habits=S.habits.filter(x=>x.id!==mEditId);
   else S.tasks=S.tasks.filter(x=>x.id!==mEditId);
   save();closeModal();
-  if(type==='habit')renderHabits();else renderTasks();
+  if(type==='habit'){renderHabits();renderHabitFilters();}else{renderTasks();renderTaskFilters();}
   updateRing();snapshotHistory();
 }
 function saveHabit(){
   const name=(document.getElementById('m-name').value||'').trim();if(!name)return;
-  if(mEditId){const h=S.habits.find(x=>x.id===mEditId);if(h){h.name=name;h.days=[...mDays];}}
-  else S.habits.push({id:Date.now(),name,days:[...mDays],streak:0,done:{}});
-  save();closeModal();renderHabits();updateRing();
+  const tag=(document.getElementById('m-tag').value||'').trim().toLowerCase();
+  const days=mRepeat==='daily'?[0,1,2,3,4,5,6]:mRepeat==='once'?[]:mDays;
+  if(mEditId){const h=S.habits.find(x=>x.id===mEditId);if(h){h.name=name;h.tag=tag;h.color=mColor;h.repeat=mRepeat;h.days=[...days];}}
+  else S.habits.push({id:Date.now(),name,tag,color:mColor,repeat:mRepeat,days:[...days],streak:0,done:{}});
+  save();closeModal();renderHabits();renderHabitFilters();updateRing();
 }
 function saveTask(){
   const name=(document.getElementById('m-name').value||'').trim();if(!name)return;
-  const prio=document.getElementById('m-prio').value;
-  if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.priority=prio;}}
-  else S.tasks.push({id:Date.now(),name,priority:prio,done:false});
-  save();closeModal();renderTasks();updateRing();
+  const tag=(document.getElementById('m-tag').value||'').trim().toLowerCase();
+  const prioEl=document.querySelector('#m-body .m-repeat-pill.sel');
+  const prio=prioEl?prioEl.textContent.toLowerCase()==='alta'?'alta':'normal':'normal';
+  const due=document.getElementById('m-due').value||null;
+  if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.tag=tag;t.color=mColor;t.priority=prio;t.due=due;}}
+  else S.tasks.push({id:Date.now(),name,tag,color:mColor,priority:prio,due,done:false});
+  save();closeModal();renderTasks();renderTaskFilters();updateRing();
 }
 function saveFinance(type){
   const name=(document.getElementById('m-name').value||'').trim();
@@ -931,7 +1081,7 @@ document.addEventListener('keydown',e=>{
   else if(mType==='task')saveTask();
 });
 
-load();updateXPBar();updateRing();renderHabits();snapshotHistory();
+load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();
 </script>
 </body>
 </html>
