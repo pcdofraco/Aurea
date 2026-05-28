@@ -156,7 +156,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .add-btn{padding:7px 14px;border-radius:var(--r2);font-size:clamp(9px,1.9vw,10px);letter-spacing:0.12em;text-transform:uppercase;}
 
 /* ── LIST ITEMS — no cards, no checkmarks ── */
-.list-item{display:flex;align-items:center;gap:14px;padding:clamp(13px,2.5vw,17px) 0;border-bottom:1px solid var(--sep);position:relative;}
+.task-list-wrap{position:relative;}
+.task-list-wrap::before{
+  content:'';position:absolute;
+  left:10px;top:0;bottom:0;
+  width:1px;background:rgba(255,255,255,0.08);
+  pointer-events:none;z-index:0;
+}
+.list-item{display:flex;align-items:center;gap:14px;padding:clamp(11px,2.2vw,14px) 0;border-bottom:none;position:relative;}
 .list-item:last-child{border-bottom:none;}
 
 /* circle — empty by default, filled when done */
@@ -168,8 +175,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   background:transparent;
 }
 .chk-c.done{
-  background:rgba(255,255,255,0.88);
-  border-color:rgba(255,255,255,0.88);
+  /* cor vem via style inline */
 }
 
 /* square — empty by default */
@@ -181,8 +187,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   background:transparent;
 }
 .chk-s.done{
-  background:rgba(255,255,255,0.88);
-  border-color:rgba(255,255,255,0.88);
+  /* cor vem via style inline */
 }
 
 .item-body{flex:1;min-width:0;}
@@ -264,11 +269,34 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .empty{padding:clamp(28px,6vw,48px) 0;font-family:var(--mono);font-size:clamp(9px,2vw,10px);letter-spacing:0.12em;color:var(--t4);text-transform:uppercase;}
 
 /* ── MODAL ── */
-#modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:none;align-items:flex-end;padding-bottom:var(--sb);}
+#modal-overlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  display:none;align-items:flex-end;
+  padding-bottom:var(--sb);
+}
 #modal-overlay.open{display:flex;}
-.modal{width:100%;max-width:640px;margin:0 auto;border-radius:20px 20px 0 0;background:rgba(16,16,16,0.98);border-top:1px solid rgba(255,255,255,0.1);padding:16px 22px calc(28px + var(--sb));animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);}
+.modal{
+  width:100%;max-width:640px;margin:0 auto;
+  background:rgba(18,18,18,0.92);
+  border:none;
+  padding:32px 24px calc(32px + var(--sb));
+  animation:slideUp 0.32s cubic-bezier(0.34,1.2,0.64,1);
+  position:relative;
+  /* máscara que dissolve nas 4 bordas */
+  -webkit-mask-image:
+    linear-gradient(to right,  transparent 0%, black 7%, black 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 12%, black 100%, black 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to right,  transparent 0%, black 7%, black 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 12%, black 100%, black 100%);
+  mask-composite: intersect;
+}
+.modal::before{content:none;}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-handle{width:28px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;margin:0 auto 0;}
+.modal-handle{width:28px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;margin:0 auto 4px;}
 
 /* modal header row: title + X */
 .modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 0 20px;}
@@ -311,9 +339,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .m-delete{display:block;width:100%;background:none;border:none;font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,90,80,0.4);cursor:pointer;padding:12px 0 0;text-align:center;transition:color 0.15s;}
 .m-delete:active{color:rgba(255,90,80,0.8);}
 
-/* label inside tag row */
-.m-tag-row{display:flex;align-items:center;gap:12px;}
-.m-tag-row .m-flat{flex:1;}
+/* tag row: input acima, cores abaixo */
+.m-tag-row{display:flex;flex-direction:column;gap:10px;}
+.m-tag-row .m-flat{width:100%;}
+.m-tag-row .m-colors{margin-top:2px;}
 
 /* ── FILTER BAR ── */
 .filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
@@ -338,6 +367,79 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @keyframes barGrow{from{width:0}to{}}
 .cat-bar{animation:barGrow 0.7s cubic-bezier(0.34,1.2,0.64,1);}
 
+/* ── QUICK-ADD (mesmo nível das tarefas) ── */
+#task-quick-add{
+  display:flex;align-items:center;gap:14px;
+  padding:clamp(11px,2.2vw,14px) 0;
+  cursor:pointer;position:relative;
+}
+.qa-circle{
+  width:20px;height:20px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.18);
+  flex-shrink:0;
+  background:transparent;
+  transition:border-color 0.3s;
+  position:relative;z-index:1;
+}
+@keyframes qa-blink{
+  0%,100%{opacity:1;}
+  50%{opacity:0.2;}
+}
+.qa-label{
+  flex:1;font-family:var(--sans);font-size:clamp(14px,2.8vw,16px);
+  font-weight:500;
+  color:rgba(255,255,255,0.25);
+  animation:qa-blink 2.4s ease-in-out infinite;
+}
+
+/* ── DRAG & DROP ── */
+.list-item.dragging{
+  opacity:0.35;
+  background:rgba(255,255,255,0.03);
+  border-radius:8px;
+}
+.list-item.drag-over{
+  border-top:1px solid rgba(255,255,255,0.28);
+}
+.list-item[draggable]{cursor:grab;}
+.list-item[draggable]:active{cursor:grabbing;}
+
+/* ── FAB FLUTUANTE ── */
+#fab-wrap{
+  position:fixed;
+  bottom:calc(28px + env(safe-area-inset-bottom,0px));
+  left:50%;transform:translateX(-50%);
+  z-index:100;
+  pointer-events:none;
+}
+#fab-btn{
+  pointer-events:all;
+  background:rgba(30,30,30,0.72);
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  border:1px solid rgba(255,255,255,0.13);
+  border-bottom-color:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.75);
+  font-family:var(--mono);
+  font-size:22px;
+  font-weight:300;
+  width:52px;height:52px;
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 24px rgba(0,0,0,0.55),0 1px 0 rgba(255,255,255,0.08) inset;
+  transition:transform 0.15s,color 0.15s,background 0.15s;
+  line-height:1;
+  padding-bottom:1px;
+}
+#fab-btn:active{
+  transform:scale(0.93);
+  background:rgba(45,45,45,0.85);
+  color:rgba(255,255,255,0.95);
+}
+/* esconde fab nas seções que não precisam */
+#fab-wrap.hidden{display:none;}
+
 /* TOAST */
 #toast{position:fixed;top:calc(var(--st) + 14px);left:50%;transform:translateX(-50%) translateY(-120%);border-radius:30px;padding:9px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;background:rgba(255,255,255,0.93);color:#0d0d0d;font-weight:700;z-index:999;pointer-events:none;transition:transform 0.4s cubic-bezier(0.34,1.4,0.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);}
@@ -356,13 +458,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="h-center">
       <span class="h-logo">AUREA</span>
     </div>
-    <div class="prog-card">
-      <div class="pc-label" id="pc-label">hoje</div>
-      <div class="pc-ring-wrap">
-        <svg viewBox="0 0 36 36"><circle class="pc-ring-bg" cx="18" cy="18" r="15.5"/><circle class="pc-ring-fill" id="ring-fill" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg>
-        <div class="pc-pct" id="ring-pct">0%</div>
-      </div>
-      <div class="pc-sub" id="pc-sub">0 de 0</div>
+    <div style="width:36px;flex-shrink:0;">
+      <!-- ring hidden but elements kept for JS -->
+      <svg style="display:none" viewBox="0 0 36 36"><circle class="pc-ring-bg" cx="18" cy="18" r="15.5"/><circle class="pc-ring-fill" id="ring-fill" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg>
+      <span id="ring-pct" style="display:none"></span>
+      <span id="pc-sub" style="display:none"></span>
+      <span id="pc-label" style="display:none"></span>
     </div>
   </div>
 
@@ -372,19 +473,20 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div id="sec-habitos" class="section active">
       <div class="sec-hdr">
         <div class="sec-title">Hábitos diários</div>
-        <button class="add-btn btn-3d" onclick="openModal('habit',null)">+ Novo</button>
       </div>
       <div class="filter-bar" id="habit-filters"></div>
       <div id="habits-list"></div>
     </div>
 
     <div id="sec-tarefas" class="section">
-      <div class="sec-hdr">
-        <div class="sec-title">Lista de tarefas</div>
-        <button class="add-btn btn-3d" onclick="openModal('task',null)">+ Nova</button>
-      </div>
       <div class="filter-bar" id="task-filters"></div>
-      <div id="tasks-list"></div>
+      <div class="task-list-wrap">
+        <div id="task-quick-add" onclick="openModal('task',null)">
+          <div class="qa-circle"></div>
+          <div class="qa-label">Adicionar tarefa…</div>
+        </div>
+        <div id="tasks-list"></div>
+      </div>
     </div>
 
     <div id="sec-financas" class="section">
@@ -457,6 +559,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
   </div>
+</div>
+
+<!-- FAB FLUTUANTE -->
+<div id="fab-wrap">
+  <button id="fab-btn" onclick="onFabClick()">+</button>
 </div>
 
 <!-- DRAWER OVERLAY -->
@@ -564,6 +671,7 @@ function setTab(name,label){
   else if(name==='habitos'){renderHabits();renderHabitFilters();}
   else if(name==='tarefas'){renderTasks();renderTaskFilters();}
   else if(name==='stats')renderStats();
+  updateFab();
 }
 
 /* XP */
@@ -682,11 +790,14 @@ function renderHabits(){
     const done=h.done&&h.done[today];
     const repeatLabel=REPEAT_TYPES.find(r=>r.id===h.repeat)?.label||'Todo dia';
     const dot=h.color||TAG_COLORS[0];
+    // cor só na bolinha
+    const chkStyle=done
+      ?`background:${dot};border-color:${dot};`
+      :`border-color:${dot};`;
     const row=document.createElement('div');
     row.className='list-item';
     row.innerHTML=`
-      <div class="chk-c${done?' done':''}"></div>
-      <div class="item-dot" style="background:${dot}"></div>
+      <div class="chk-c${done?' done':''}" style="${chkStyle}"></div>
       <div class="item-body">
         <div class="item-name${done?' done':''}">${h.name}</div>
         <div class="item-meta">🔥 ${h.streak||0} · ${h.tag?'#'+h.tag+' · ':''}${repeatLabel}</div>
@@ -702,12 +813,15 @@ function toggleHabit(id,row){
   const today=new Date().toDateString();
   if(!h.done)h.done={};
   const chk=row.querySelector('.chk-c'),nm=row.querySelector('.item-name');
+  const dot=h.color||TAG_COLORS[0];
   if(h.done[today]){
     delete h.done[today];h.streak=Math.max(0,(h.streak||1)-1);
     chk.classList.remove('done');nm.classList.remove('done');
+    chk.style.background='';chk.style.borderColor=dot;
   }else{
     h.done[today]=1;h.streak=(h.streak||0)+1;
     chk.classList.add('done');nm.classList.add('done');
+    chk.style.background=dot;chk.style.borderColor=dot;
     addXP(XP_H,chk);showToast('+'+XP_H+' XP');
     if(S.habits.filter(hh=>hh.done&&hh.done[today]).length===1)S.streak=(S.streak||0)+1;
   }
@@ -719,7 +833,7 @@ function toggleHabit(id,row){
 function renderTasks(){
   const el=document.getElementById('tasks-list');
   const list=taskFilter==='all'?S.tasks:S.tasks.filter(t=>t.tag===taskFilter);
-  if(!list.length){el.innerHTML='<div class="empty">'+(S.tasks.length?'Nenhuma tarefa com essa tag':'Nenhuma tarefa ainda')+'</div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty" style="padding-left:34px;">'+(S.tasks.length?'Nenhuma tarefa com essa tag':'')+'</div>';return;}
   el.innerHTML='';
   const today=new Date();today.setHours(0,0,0,0);
   const pending=list.filter(t=>!t.done),done=list.filter(t=>t.done);
@@ -731,31 +845,49 @@ function renderTasks(){
       const diff=Math.round((d-today)/(1000*60*60*24));
       const label=diff===0?'hoje':diff===1?'amanhã':diff<0?`${Math.abs(diff)}d atraso`:`${diff}d`;
       const cls=diff<0?'over':diff<=2?'soon':'';
-      dueBadge=`<div class="item-due ${cls}">${label}</div>`;
+      dueBadge=`<span class="item-due ${cls}">${label}</span>`;
     }
     const row=document.createElement('div');
     row.className='list-item';
+    row.draggable=true;
+    row.dataset.id=t.id;
+    const chkStyle=t.done
+      ?`background:${dot};border-color:${dot};`
+      :`border-color:${dot};`;
+    const metaParts=[];
+    if(t.tag)metaParts.push('#'+t.tag);
+    if(t.priority==='alta')metaParts.push('alta');
     row.innerHTML=`
-      <div class="chk-s${t.done?' done':''}"></div>
-      <div class="item-dot" style="background:${dot}"></div>
+      <div class="chk-c${t.done?' done':''}" style="${chkStyle}"></div>
       <div class="item-body">
-        <div class="item-name${t.done?' done':''}">${t.name}</div>
-        ${t.tag?`<div class="item-meta">#${t.tag}${t.priority==='alta'?' · alta':''}</div>`:(t.priority==='alta'?`<div class="item-meta">alta prioridade</div>`:'')}
+        <div class="item-name${t.done?' done':''}">${t.name}${dueBadge?'&ensp;'+dueBadge:''}</div>
+        ${metaParts.length?`<div class="item-meta">${metaParts.join(' · ')}</div>`:''}
       </div>
-      ${dueBadge}
-      <div class="item-tag${t.priority==='alta'?' high':''}">${t.priority||'normal'}</div>
       <button class="edit-btn" title="Editar">✎</button>`;
-    row.querySelector('.chk-s').addEventListener('click',e=>{e.stopPropagation();toggleTask(t.id,row);});
+    row.querySelector('.chk-c').addEventListener('click',e=>{e.stopPropagation();toggleTask(t.id,row);});
     row.querySelector('.edit-btn').addEventListener('click',e=>{e.stopPropagation();openModal('task',t.id);});
+    row.addEventListener('dragstart',onDragStart);
+    row.addEventListener('dragover',onDragOver);
+    row.addEventListener('dragleave',onDragLeave);
+    row.addEventListener('drop',onDrop);
+    row.addEventListener('dragend',onDragEnd);
     el.appendChild(row);
   });
+  initTouchDrag(el);
 }
 function toggleTask(id,row){
   const t=S.tasks.find(x=>x.id===id);if(!t)return;
   t.done=!t.done;
-  const chk=row.querySelector('.chk-s'),nm=row.querySelector('.item-name');
-  if(t.done){chk.classList.add('done');nm.classList.add('done');addXP(XP_T,chk);showToast('+'+XP_T+' XP');}
-  else{chk.classList.remove('done');nm.classList.remove('done');}
+  const chk=row.querySelector('.chk-c'),nm=row.querySelector('.item-name');
+  const dot=t.color||TAG_COLORS[0];
+  if(t.done){
+    chk.classList.add('done');nm.classList.add('done');
+    chk.style.background=dot;chk.style.borderColor=dot;
+    addXP(XP_T,chk);showToast('+'+XP_T+' XP');
+  }else{
+    chk.classList.remove('done');nm.classList.remove('done');
+    chk.style.background='';chk.style.borderColor=dot;
+  }
   save();updateRing();snapshotHistory();
 }
 
@@ -995,7 +1127,8 @@ function openModal(type,editId){
 
   }else if(type==='task'){
     const t=isEdit?S.tasks.find(x=>x.id===editId):null;
-    if(t){mColor=t.color||TAG_COLORS[0];}
+    if(t){mColor=t.color||TAG_COLORS[0];mRepeat=t.repeat||'once';mDays=[...(t.days||[])];}
+    else{mRepeat='once';mDays=[];}
     title.textContent=isEdit?'Editar tarefa':'Nova tarefa';
     body.innerHTML=`
       <div class="m-field">
@@ -1016,12 +1149,20 @@ function openModal(type,editId){
         </div>
       </div>
       <div class="m-field">
+        <div class="m-field-label">Repetição</div>
+        <div class="m-pills" id="m-repeat-row"></div>
+      </div>
+      <div class="m-field" id="m-days-section" style="display:none">
+        <div class="m-field-label">Dias</div>
+        <div class="m-days" id="m-days-row"></div>
+      </div>
+      <div class="m-field">
         <div class="m-field-label">Data limite <span style="font-size:7px;color:var(--t4)">opcional</span></div>
         <input class="m-flat" id="m-due" type="date" value="${t&&t.due?t.due:''}">
       </div>
       ${isEdit?`<button class="m-delete" onclick="deleteItem('task')">excluir tarefa</button>`:''}
       <button class="m-save" onclick="saveTask()">${isEdit?'salvar':'criar tarefa'}</button>`;
-    renderMColors();
+    renderMColors();renderMRepeat();renderMDays();
 
   }else{
     const isIn=type==='fin-in';
@@ -1117,9 +1258,10 @@ function saveTask(){
   const tag=(document.getElementById('m-tag').value||'').trim().toLowerCase();
   const prioEl=document.querySelector('#m-body .m-pills .m-pill.sel');
   const prio=prioEl&&prioEl.textContent.trim()==='Alta'?'alta':'normal';
-  const due=document.getElementById('m-due').value||null;
-  if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.tag=tag;t.color=mColor;t.priority=prio;t.due=due;}}
-  else S.tasks.push({id:Date.now(),name,tag,color:mColor,priority:prio,due,done:false});
+  const due=document.getElementById('m-due')?document.getElementById('m-due').value||null:null;
+  const days=mRepeat==='daily'?[0,1,2,3,4,5,6]:mRepeat==='once'?[]:mDays;
+  if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.tag=tag;t.color=mColor;t.priority=prio;t.due=due;t.repeat=mRepeat;t.days=[...days];}}
+  else S.tasks.push({id:Date.now(),name,tag,color:mColor,priority:prio,due,repeat:mRepeat,days:[...days],done:false});
   save();closeModal();renderTasks();renderTaskFilters();updateRing();
 }
 function saveFinance(type){
@@ -1139,7 +1281,105 @@ document.addEventListener('keydown',e=>{
   else if(mType==='task')saveTask();
 });
 
-load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();
+function onFabClick(){
+  if(curTab==='habitos')openModal('habit',null);
+  else if(curTab==='tarefas')openModal('task',null);
+}
+
+function updateFab(){
+  const fab=document.getElementById('fab-wrap');
+  if(curTab==='habitos'){fab.classList.remove('hidden');}
+  else{fab.classList.add('hidden');}
+}
+
+/* ── DRAG & DROP (reordenar tarefas) ── */
+let dragSrc=null;
+function onDragStart(e){
+  dragSrc=this;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',this.dataset.id);
+}
+function onDragOver(e){
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  if(this!==dragSrc)this.classList.add('drag-over');
+}
+function onDragLeave(){this.classList.remove('drag-over');}
+function onDrop(e){
+  e.preventDefault();e.stopPropagation();
+  this.classList.remove('drag-over');
+  if(!dragSrc||dragSrc===this)return;
+  const fromId=parseInt(dragSrc.dataset.id);
+  const toId=parseInt(this.dataset.id);
+  const fi=S.tasks.findIndex(x=>x.id===fromId);
+  const ti=S.tasks.findIndex(x=>x.id===toId);
+  if(fi<0||ti<0)return;
+  const [moved]=S.tasks.splice(fi,1);
+  S.tasks.splice(ti,0,moved);
+  save();renderTasks();
+}
+function onDragEnd(){
+  document.querySelectorAll('.list-item').forEach(r=>r.classList.remove('dragging','drag-over'));
+  dragSrc=null;
+}
+
+/* touch drag para mobile */
+function initTouchDrag(container){
+  let touchItem=null,clone=null,startY=0,itemH=0;
+  container.addEventListener('touchstart',e=>{
+    const row=e.target.closest('.list-item[draggable]');
+    if(!row)return;
+    // precisa segurar 500ms
+    let held=false;
+    const t=setTimeout(()=>{
+      held=true;
+      touchItem=row;
+      itemH=row.offsetHeight;
+      startY=e.touches[0].clientY;
+      clone=row.cloneNode(true);
+      clone.style.cssText=`position:fixed;z-index:999;width:${row.offsetWidth}px;opacity:0.85;
+        top:${row.getBoundingClientRect().top}px;left:${row.getBoundingClientRect().left}px;
+        pointer-events:none;border-radius:8px;background:rgba(30,30,30,0.9);`;
+      document.body.appendChild(clone);
+      row.classList.add('dragging');
+      navigator.vibrate&&navigator.vibrate(30);
+    },480);
+    const cancel=()=>{if(!held)clearTimeout(t);};
+    row.addEventListener('touchend',cancel,{once:true});
+    row.addEventListener('touchmove',cancel,{once:true,passive:true});
+  },{passive:true});
+
+  container.addEventListener('touchmove',e=>{
+    if(!touchItem||!clone)return;
+    e.preventDefault();
+    const y=e.touches[0].clientY;
+    clone.style.top=(clone.getBoundingClientRect().top+(y-startY))+'px';
+    startY=y;
+    // find target
+    const els=[...container.querySelectorAll('.list-item:not(.dragging)')];
+    els.forEach(r=>r.classList.remove('drag-over'));
+    const over=els.find(r=>{const b=r.getBoundingClientRect();return y>=b.top&&y<=b.bottom;});
+    if(over)over.classList.add('drag-over');
+  },{passive:false});
+
+  container.addEventListener('touchend',e=>{
+    if(!touchItem||!clone)return;
+    clone.remove();clone=null;
+    const over=container.querySelector('.list-item.drag-over');
+    if(over&&over!==touchItem){
+      const fromId=parseInt(touchItem.dataset.id);
+      const toId=parseInt(over.dataset.id);
+      const fi=S.tasks.findIndex(x=>x.id===fromId);
+      const ti=S.tasks.findIndex(x=>x.id===toId);
+      if(fi>=0&&ti>=0){const [m]=S.tasks.splice(fi,1);S.tasks.splice(ti,0,m);save();}
+    }
+    container.querySelectorAll('.list-item').forEach(r=>r.classList.remove('dragging','drag-over'));
+    touchItem=null;
+    renderTasks();
+  },{passive:true});
+}
+
+load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
 </script>
 </body>
 </html>
