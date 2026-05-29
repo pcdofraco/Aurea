@@ -66,8 +66,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
 .menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);background:rgba(255,255,255,0.9);}
 
-/* LOGO small */
-.h-logo{font-family:var(--mono);font-size:clamp(10px,2.2vw,13px);letter-spacing:0.22em;color:var(--t2);font-weight:700;}
+/* LOGO small — removido do header */
+.h-logo{display:none;}
+
+/* GREETING */
+.h-greeting{flex:1;min-width:0;}
+.h-greeting-line{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--t4);text-transform:uppercase;}
+.h-name{font-size:clamp(17px,4.5vw,22px);font-weight:600;color:var(--t1);letter-spacing:-0.01em;line-height:1.15;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* PROGRESS RING — minimalista, sem caixa */
 .prog-card{flex-shrink:0;text-align:center;background:none;border:none;padding:0;}
@@ -151,6 +156,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 #content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 clamp(16px,5vw,48px) calc(24px + var(--sb));}
 #content::-webkit-scrollbar{display:none;}
 .section{display:none;}.section.active{display:block;}
+@keyframes secIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes secInLeft{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:translateX(0)}}
+@keyframes secInRight{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+.section.active.anim-up{animation:secIn 0.28s ease-out both;}
+.section.active.anim-left{animation:secInLeft 0.25s ease-out both;}
+.section.active.anim-right{animation:secInRight 0.25s ease-out both;}
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:clamp(8px,1.5vw,14px);}
 .sec-title{font-family:var(--mono);font-size:clamp(9px,2vw,10px);letter-spacing:0.2em;color:var(--t3);text-transform:uppercase;}
 .add-btn{padding:7px 14px;border-radius:var(--r2);font-size:clamp(9px,1.9vw,10px);letter-spacing:0.12em;text-transform:uppercase;}
@@ -205,7 +216,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* ── FINANCE ── */
 /* saldo hero */
-.fin-hero-card{border-radius:var(--r);padding:clamp(16px,4vw,24px);margin-bottom:10px;}
 .fin-hero-lbl{font-family:var(--mono);font-size:clamp(8px,1.5vw,9px);letter-spacing:0.2em;color:var(--t3);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .fin-hero-lbl svg{opacity:0.4;}
 .fin-hero-val{font-size:clamp(36px,9vw,58px);font-weight:300;line-height:1;margin-bottom:14px;letter-spacing:-1px;}
@@ -218,8 +228,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .bank-tag-name{font-family:var(--mono);font-size:clamp(9px,2vw,10px);color:var(--t2);}
 .bank-tag-val{font-family:var(--mono);font-size:clamp(9px,2vw,10px);color:var(--t3);}
 /* receita / despesas cards */
-.fin-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.fin-split-card{border-radius:var(--r);padding:clamp(14px,3vw,20px);}
 .fin-split-icon{font-size:13px;margin-bottom:8px;opacity:0.6;}
 .fin-split-lbl{font-family:var(--mono);font-size:clamp(7px,1.5vw,9px);letter-spacing:0.15em;color:var(--t3);text-transform:uppercase;margin-bottom:8px;}
 .fin-split-val{font-size:clamp(18px,4.5vw,26px);font-weight:700;line-height:1;margin-bottom:4px;}
@@ -250,17 +258,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .cat-pct{font-family:var(--mono);font-size:clamp(9px,2vw,10px);color:var(--t3);flex:0 0 32px;text-align:right;}
 /* trans */
 .trans-lbl{font-family:var(--mono);font-size:clamp(8px,1.5vw,9px);letter-spacing:0.18em;color:var(--t3);text-transform:uppercase;margin:clamp(14px,3vw,18px) 0 clamp(6px,1.2vw,8px);}
-.fin-btns{display:flex;gap:8px;margin-top:clamp(10px,2vw,16px);}
-.fin-btn{flex:1;padding:12px;border-radius:var(--r2);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:none;font-family:var(--mono);}
 
 /* ── STATS ── */
 .period-row{display:flex;gap:6px;margin-bottom:16px;}
 .period-btn{padding:7px 14px;border-radius:var(--r2);font-family:var(--mono);font-size:clamp(9px,2vw,10px);letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;}
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.mini-card{border-radius:var(--r);padding:clamp(13px,2.5vw,18px);}
-.mini-val{font-family:var(--mono);font-size:clamp(20px,5vw,28px);font-weight:700;line-height:1;}
-.mini-lbl{font-family:var(--mono);font-size:clamp(8px,1.5vw,9px);letter-spacing:0.1em;color:var(--t3);margin-top:5px;text-transform:uppercase;}
-.chart-wrap{border-radius:var(--r);padding:clamp(14px,3vw,20px) clamp(14px,3vw,18px) clamp(10px,2vw,14px);margin-bottom:12px;}
 .chart-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;}
 .chart-title{font-family:var(--mono);font-size:clamp(8px,1.8vw,10px);letter-spacing:0.16em;color:var(--t3);text-transform:uppercase;}
 .chart-avg{font-family:var(--mono);font-size:clamp(10px,2vw,12px);color:var(--t2);}
@@ -362,7 +364,40 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .item-due.soon{color:rgba(255,180,60,0.9);}
 .item-due.over{color:rgba(255,90,80,0.85);}
 
-/* ── FINANCE ANIMATIONS ── */
+/* ── DASHBOARD ── */
+#dash-spiral{display:block;margin:0 auto 28px;opacity:0.85;}
+.dash-greet{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--t4);text-transform:uppercase;margin-bottom:4px;}
+.dash-name{font-size:clamp(22px,6vw,30px);font-weight:600;color:var(--t1);letter-spacing:-0.02em;margin-bottom:28px;}
+.dash-divider{height:1px;background:var(--sep);margin:18px 0;}
+.dash-section-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;color:var(--t4);text-transform:uppercase;margin-bottom:12px;}
+.dash-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+.dash-row-name{font-size:13px;color:var(--t2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dash-row-meta{font-family:var(--mono);font-size:10px;color:var(--t4);flex-shrink:0;margin-left:10px;}
+.dash-row-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-right:10px;margin-bottom:1px;}
+.dash-empty{font-family:var(--mono);font-size:9px;color:var(--t4);letter-spacing:0.1em;}
+.dash-fin-row{display:flex;justify-content:space-between;margin-bottom:8px;}
+.dash-fin-lbl{font-size:13px;color:var(--t2);}
+.dash-fin-val{font-family:var(--mono);font-size:13px;}
+.dash-fin-val.pos{color:rgba(100,210,140,0.9);}
+.dash-fin-val.neg{color:rgba(255,100,90,0.85);}
+
+/* ── FINANCE minimal — sem glass nos cards ── */
+.fin-hero-card{border-radius:var(--r);padding:clamp(16px,4vw,24px);margin-bottom:10px;background:none;}
+.fin-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.fin-split-card{border-radius:var(--r);padding:clamp(14px,3vw,20px);background:none;}
+.fin-btns-top{display:flex;gap:8px;margin-bottom:18px;}
+.fin-btn{flex:1;padding:12px;border-radius:var(--r2);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:none;font-family:var(--mono);}
+
+/* ── STATS minimal — sem glass nos cards ── */
+.mini-card{border-radius:var(--r);padding:clamp(13px,2.5vw,18px);background:none;}
+.mini-val{font-family:var(--mono);font-size:clamp(18px,4vw,24px);font-weight:700;color:var(--t1);}
+.mini-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--t4);text-transform:uppercase;margin-top:4px;}
+.chart-wrap{border-radius:var(--r);padding:clamp(14px,3vw,20px) clamp(14px,3vw,18px) clamp(10px,2vw,14px);margin-bottom:12px;
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  -webkit-mask:radial-gradient(ellipse 100% 100% at 50% 50%,#000 70%,transparent 100%);
+  mask:radial-gradient(ellipse 100% 100% at 50% 50%,#000 70%,transparent 100%);
+}
 @keyframes countUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fin-hero-val.animating{animation:countUp 0.6s cubic-bezier(0.34,1.2,0.64,1);}
 .fin-split-val.animating{animation:countUp 0.5s cubic-bezier(0.34,1.2,0.64,1);}
@@ -456,6 +491,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* esconde fab nas seções que não precisam */
 #fab-wrap.hidden{display:none;}
 
+/* DRAWER PROFILE */
+.drawer-profile{padding:20px 24px 0;border-top:1px solid var(--sep);}
+.drawer-profile-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.drawer-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.drawer-profile-info{min-width:0;}
+.drawer-profile-name{font-size:14px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.drawer-profile-sub{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--t4);text-transform:uppercase;margin-top:2px;}
+.drawer-name-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.09);padding:6px 0;font-family:var(--sans);font-size:14px;color:var(--t1);outline:none;transition:border-color 0.2s;margin-bottom:14px;}
+.drawer-name-input:focus{border-bottom-color:rgba(255,255,255,0.28);}
+.drawer-name-input::placeholder{color:var(--t4);}
+
 /* TOAST */
 #toast{position:fixed;top:calc(var(--st) + 14px);left:50%;transform:translateX(-50%) translateY(-120%);border-radius:30px;padding:9px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;background:rgba(255,255,255,0.93);color:#0d0d0d;font-weight:700;z-index:999;pointer-events:none;transition:transform 0.4s cubic-bezier(0.34,1.4,0.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);}
@@ -471,8 +517,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <button class="menu-btn" id="menu-btn" onclick="toggleDrawer()">
       <span></span><span></span><span></span>
     </button>
-    <div class="h-center">
-      <span class="h-logo">AUREA</span>
+    <div class="h-greeting">
+      <div class="h-greeting-line" id="h-greeting-line">bom dia</div>
+      <div class="h-name" id="h-name">—</div>
     </div>
     <div style="width:36px;flex-shrink:0;">
       <!-- ring hidden but elements kept for JS -->
@@ -484,9 +531,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 
   <!-- CONTENT -->
-  <div id="content">
+  <div id="content" style="padding-bottom:calc(90px + var(--sb))">
 
-    <div id="sec-habitos" class="section active">
+    <div id="sec-dashboard" class="section active">
+      <canvas id="dash-spiral" width="260" height="100"></canvas>
+      <div class="dash-greet" id="dash-greet-line">bom dia</div>
+      <div class="dash-name" id="dash-name-big">—</div>
+      <div class="dash-divider"></div>
+      <div class="dash-section-lbl">hábitos de hoje</div>
+      <div id="dash-habits"></div>
+      <div class="dash-divider"></div>
+      <div class="dash-section-lbl">tarefas pendentes</div>
+      <div id="dash-tasks"></div>
+      <div class="dash-divider"></div>
+      <div class="dash-section-lbl">finanças</div>
+      <div id="dash-finance"></div>
+    </div>
+
+    <div id="sec-habitos" class="section">
       <div class="sec-hdr">
         <div class="sec-title">Hábitos diários</div>
       </div>
@@ -506,8 +568,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <div id="sec-financas" class="section">
+      <!-- BOTÕES ENTRADA/SAÍDA no topo -->
+      <div class="fin-btns-top">
+        <button class="fin-btn btn-3d" onclick="openModal('fin-in',null)">↑ Entrada</button>
+        <button class="fin-btn btn-3d" onclick="openModal('fin-out',null)">↓ Saída</button>
+      </div>
       <!-- HERO SALDO -->
-      <div class="fin-hero-card glass">
+      <div class="fin-hero-card">
         <div class="fin-hero-lbl">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="3" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 3V2.5A1.5 1.5 0 0 1 4.5 1h3A1.5 1.5 0 0 1 9 2.5V3" stroke="currentColor" stroke-width="1.2"/></svg>
           Saldo total
@@ -517,12 +584,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       </div>
       <!-- RECEITA / DESPESAS -->
       <div class="fin-split">
-        <div class="fin-split-card glass">
+        <div class="fin-split-card">
           <div class="fin-split-lbl">↑ Receita</div>
           <div class="fin-split-val val-in" id="fin-in">R$ 0</div>
           <div class="fin-split-delta delta-pos" id="fin-in-delta"></div>
         </div>
-        <div class="fin-split-card glass">
+        <div class="fin-split-card">
           <div class="fin-split-lbl">↓ Despesas</div>
           <div class="fin-split-val val-out" id="fin-out">R$ 0</div>
           <div class="fin-split-delta delta-neg" id="fin-out-delta"></div>
@@ -545,10 +612,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <!-- TRANSAÇÕES -->
       <div class="trans-lbl">Transações</div>
       <div id="trans-list"></div>
-      <div class="fin-btns">
-        <button class="fin-btn btn-3d" onclick="openModal('fin-in',null)">↑ Entrada</button>
-        <button class="fin-btn btn-3d" onclick="openModal('fin-out',null)">↓ Saída</button>
-      </div>
     </div>
 
     <div id="sec-stats" class="section">
@@ -557,17 +620,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <button class="period-btn btn-3d" onclick="setPeriod('month',this)">Mês</button>
       </div>
       <div class="mini-grid">
-        <div class="mini-card glass"><div class="mini-val" id="ms-h">—</div><div class="mini-lbl">Taxa hábitos</div></div>
-        <div class="mini-card glass"><div class="mini-val" id="ms-t">—</div><div class="mini-lbl">Taxa tarefas</div></div>
-        <div class="mini-card glass"><div class="mini-val" id="ms-s">0</div><div class="mini-lbl">Melhor streak</div></div>
-        <div class="mini-card glass"><div class="mini-val" id="ms-x">0</div><div class="mini-lbl">XP total</div></div>
+        <div class="mini-card"><div class="mini-val" id="ms-h">—</div><div class="mini-lbl">Taxa hábitos</div></div>
+        <div class="mini-card"><div class="mini-val" id="ms-t">—</div><div class="mini-lbl">Taxa tarefas</div></div>
+        <div class="mini-card"><div class="mini-val" id="ms-s">0</div><div class="mini-lbl">Melhor streak</div></div>
+        <div class="mini-card"><div class="mini-val" id="ms-x">0</div><div class="mini-lbl">XP total</div></div>
       </div>
-      <div class="chart-wrap glass">
+      <div class="chart-wrap">
         <div class="chart-hdr"><div class="chart-title">Conclusão de hábitos</div><div class="chart-avg" id="avg-h">—</div></div>
         <svg class="chart-svg" id="svg-h" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
         <div class="chart-xlbls" id="xlbl-h"></div>
       </div>
-      <div class="chart-wrap glass">
+      <div class="chart-wrap">
         <div class="chart-hdr"><div class="chart-title">Tarefas concluídas</div><div class="chart-avg" id="avg-t">—</div></div>
         <svg class="chart-svg" id="svg-t" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
         <div class="chart-xlbls" id="xlbl-t"></div>
@@ -589,20 +652,22 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="drawer">
   <div class="drawer-top">
     <div class="drawer-app-name">AUREA</div>
-    <div class="drawer-tagline">seu sistema de<br><strong>evolução</strong></div>
   </div>
   <div class="drawer-divider"></div>
   <div class="drawer-section-lbl">Seções</div>
-  <button class="drawer-item act" id="di-habitos" onclick="setTab('habitos','Hábitos')">
+  <button class="drawer-item act" id="di-dashboard" onclick="setTab('dashboard')">
+    <span class="d-icon">◎</span><span class="d-label">Dashboard</span>
+  </button>
+  <button class="drawer-item" id="di-habitos" onclick="setTab('habitos')">
     <span class="d-icon">○</span><span class="d-label">Hábitos</span>
   </button>
-  <button class="drawer-item" id="di-tarefas" onclick="setTab('tarefas','Tarefas')">
+  <button class="drawer-item" id="di-tarefas" onclick="setTab('tarefas')">
     <span class="d-icon">□</span><span class="d-label">Tarefas</span>
   </button>
-  <button class="drawer-item" id="di-financas" onclick="setTab('financas','Finanças')">
+  <button class="drawer-item" id="di-financas" onclick="setTab('financas')">
     <span class="d-icon">◇</span><span class="d-label">Finanças</span>
   </button>
-  <button class="drawer-item" id="di-stats" onclick="setTab('stats','Estatísticas')">
+  <button class="drawer-item" id="di-stats" onclick="setTab('stats')">
     <span class="d-icon">∿</span><span class="d-label">Estatísticas</span>
   </button>
   <div class="drawer-spacer"></div>
@@ -619,6 +684,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="drawer-stat-lbl">Streak</div>
       </div>
     </div>
+  </div>
+  <div class="drawer-profile">
+    <div class="drawer-profile-row">
+      <div class="drawer-avatar" id="d-avatar">👤</div>
+      <div class="drawer-profile-info">
+        <div class="drawer-profile-name" id="d-profile-name">Perfil</div>
+        <div class="drawer-profile-sub">toque para editar</div>
+      </div>
+    </div>
+    <input class="drawer-name-input" id="d-name-input" placeholder="seu nome…" maxlength="32" style="display:none" oninput="updateUserName(this.value)" onblur="hidNameInput()">
   </div>
 </div>
 
@@ -647,7 +722,7 @@ const REPEAT_TYPES=[
   {id:'custom',  label:'Dias custom'},
   {id:'once',    label:'Uma vez'},
 ];
-let S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[]};
+let S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''};
 let mDays=[0,1,2,3,4,5,6],mType='',mEditId=null,mColor=TAG_COLORS[0],mRepeat='daily',curTab='habitos',curPd='week';
 let habitFilter='all',taskFilter='all';
 
@@ -655,9 +730,38 @@ function save(){try{localStorage.setItem('aurea_v5',JSON.stringify(S));}catch(e)
 function load(){
   try{const d=localStorage.getItem('aurea_v5');if(d)S=JSON.parse(d);}catch(e){}
   if(!Array.isArray(S.history))S.history=[];
+  if(!S.userName)S.userName='';
   const today=new Date().toDateString();
   if(S.lastDate!==today){S.lastDate=today;save();}
 }
+
+/* GREETING */
+function updateGreeting(){
+  const h=new Date().getHours();
+  const greet=h<12?'bom dia':h<18?'boa tarde':'boa noite';
+  document.getElementById('h-greeting-line').textContent=greet;
+  const name=S.userName||'—';
+  document.getElementById('h-name').textContent=name;
+  // drawer profile
+  document.getElementById('d-profile-name').textContent=S.userName||'Perfil';
+  document.getElementById('d-avatar').textContent=S.userName?S.userName[0].toUpperCase():'👤';
+}
+function updateUserName(val){
+  S.userName=val.trim();save();updateGreeting();
+}
+function hidNameInput(){
+  const inp=document.getElementById('d-name-input');
+  if(inp){inp.style.display='none';}
+}
+// click no avatar/nome abre input
+document.addEventListener('click',e=>{
+  if(e.target.closest('.drawer-profile-row')){
+    const inp=document.getElementById('d-name-input');
+    inp.style.display='block';
+    inp.value=S.userName||'';
+    inp.focus();
+  }
+});
 
 /* DRAWER */
 function toggleDrawer(){
@@ -675,20 +779,55 @@ function closeDrawer(){
 }
 
 /* TABS */
-function setTab(name,label){
+const TAB_ORDER=['dashboard','habitos','tarefas','financas','stats'];
+function setTab(name,dir){
+  const prev=curTab;
   curTab=name;
   closeDrawer();
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>{s.classList.remove('active','anim-up','anim-left','anim-right');});
   document.querySelectorAll('.drawer-item').forEach(b=>b.classList.remove('act'));
-  document.getElementById('sec-'+name).classList.add('active');
+  const sec=document.getElementById('sec-'+name);
+  sec.classList.add('active');
+  // pick animation direction
+  let animClass='anim-up';
+  if(dir==='left')animClass='anim-left';
+  else if(dir==='right')animClass='anim-right';
+  else{
+    const pi=TAB_ORDER.indexOf(prev),ni=TAB_ORDER.indexOf(name);
+    if(pi>=0&&ni>=0)animClass=ni>pi?'anim-right':'anim-left';
+  }
+  sec.classList.add(animClass);
+  setTimeout(()=>sec.classList.remove(animClass),350);
   document.getElementById('di-'+name).classList.add('act');
   updateRing();
   if(name==='financas')renderFinance(true);
   else if(name==='habitos'){renderHabits();renderHabitFilters();}
   else if(name==='tarefas'){renderTasks();renderTaskFilters();}
   else if(name==='stats')renderStats();
+  else if(name==='dashboard'){renderDashboard();}
+  else{if(window._spiralStop)window._spiralStop();}
   updateFab();
 }
+
+/* SWIPE NAVIGATION */
+(function(){
+  let sx=0,sy=0,sw=false;
+  const THRESHOLD=52,RATIO=1.4;
+  document.getElementById('content').addEventListener('touchstart',e=>{
+    // não interfere com drag de tarefas
+    if(e.target.closest('.task-list-wrap'))return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;sw=true;
+  },{passive:true});
+  document.getElementById('content').addEventListener('touchend',e=>{
+    if(!sw)return;sw=false;
+    const dx=e.changedTouches[0].clientX-sx;
+    const dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)<THRESHOLD||Math.abs(dy/dx)>1/RATIO)return;
+    const idx=TAB_ORDER.indexOf(curTab);
+    if(dx<0&&idx<TAB_ORDER.length-1)setTab(TAB_ORDER[idx+1],'right');
+    else if(dx>0&&idx>0)setTab(TAB_ORDER[idx-1],'left');
+  },{passive:true});
+})();
 
 /* XP */
 function addXP(n,el){
@@ -895,23 +1034,6 @@ function toggleTask(id,row){
     chk.classList.add('done');nm.classList.add('done');
     chk.style.background=dot;chk.style.borderColor=dot;
     addXP(XP_T,chk);showToast('+'+XP_T+' XP');
-    // tarefas sem repetição somem após conclusão
-    if(!t.repeat||t.repeat==='once'){
-      row.style.transition='opacity 0.35s ease-out, transform 0.35s ease-out, max-height 0.4s ease-out';
-      row.style.maxHeight=row.offsetHeight+'px';
-      setTimeout(()=>{
-        row.style.opacity='0';
-        row.style.transform='translateX(18px)';
-        row.style.maxHeight='0';
-        row.style.marginBottom='0';
-        row.style.overflow='hidden';
-      },520);
-      setTimeout(()=>{
-        S.tasks=S.tasks.filter(x=>x.id!==id);
-        save();renderTasks();renderTaskFilters();updateRing();snapshotHistory();
-      },900);
-      return;
-    }
   }else{
     chk.classList.remove('done');nm.classList.remove('done');
     chk.style.background='';chk.style.borderColor=dot;
@@ -1328,9 +1450,116 @@ function onFabClick(){
 
 function updateFab(){
   const fab=document.getElementById('fab-wrap');
-  if(curTab==='habitos'){fab.classList.remove('hidden');}
+  if(!fab)return;
+  if(curTab==='habitos'||curTab==='tarefas'){fab.classList.remove('hidden');}
   else{fab.classList.add('hidden');}
+  const lbl=document.getElementById('fab-label');
+  if(lbl)lbl.textContent=curTab==='tarefas'?'+ nova tarefa':'+ novo hábito';
 }
+function fabAction(){
+  if(curTab==='habitos')openModal('habit',null);
+  else if(curTab==='tarefas')openModal('task',null);
+}
+
+/* ── DASHBOARD ── */
+function renderDashboard(){
+  const h=new Date().getHours();
+  const greet=h<12?'bom dia':h<18?'boa tarde':'boa noite';
+  const dg=document.getElementById('dash-greet-line');const dn=document.getElementById('dash-name-big');
+  if(dg)dg.textContent=greet;if(dn)dn.textContent=S.userName||'—';
+  const today=new Date().toDateString();
+  const todayDow=new Date().getDay();
+
+  // hábitos de hoje
+  const hEl=document.getElementById('dash-habits');
+  if(hEl){
+    const todayH=S.habits.filter(h=>!h.days||h.days.includes(todayDow));
+    if(!todayH.length){hEl.innerHTML='<div class="dash-empty">nenhum hábito para hoje</div>';}
+    else{
+      hEl.innerHTML='';
+      todayH.slice(0,5).forEach(h=>{
+        const done=h.done&&h.done[today];
+        const row=document.createElement('div');row.className='dash-row';
+        row.innerHTML=`<div class="dash-row-dot" style="background:${h.color||'rgba(255,255,255,0.25)'}"></div><div class="dash-row-name" style="${done?'text-decoration:line-through;opacity:0.35':''}">${h.name}</div><div class="dash-row-meta">${done?'✓':'–'}</div>`;
+        hEl.appendChild(row);
+      });
+      if(todayH.length>5){const m=document.createElement('div');m.className='dash-empty';m.style.marginTop='6px';m.textContent='+${todayH.length-5} mais';hEl.appendChild(m);}
+    }
+  }
+
+  // tarefas pendentes
+  const tEl=document.getElementById('dash-tasks');
+  if(tEl){
+    const pending=S.tasks.filter(t=>!t.done);
+    if(!pending.length){tEl.innerHTML='<div class="dash-empty">sem tarefas pendentes</div>';}
+    else{
+      tEl.innerHTML='';
+      pending.slice(0,5).forEach(t=>{
+        const row=document.createElement('div');row.className='dash-row';
+        let meta=t.priority==='alta'?'alta':'';
+        if(t.due){const d=new Date(t.due+'T00:00:00');const now=new Date();now.setHours(0,0,0,0);const diff=Math.round((d-now)/864e5);meta=diff<0?'atrasada':diff===0?'hoje':diff===1?'amanhã':meta;}
+        row.innerHTML=`<div class="dash-row-dot" style="background:${t.color||'rgba(255,255,255,0.25)'}"></div><div class="dash-row-name">${t.name}</div><div class="dash-row-meta">${meta}</div>`;
+        tEl.appendChild(row);
+      });
+    }
+  }
+
+  // finanças
+  const fEl=document.getElementById('dash-finance');
+  if(fEl){
+    const ins=S.transactions.filter(t=>t.type==='in').reduce((a,t)=>a+t.amount,0);
+    const outs=S.transactions.filter(t=>t.type==='out').reduce((a,t)=>a+t.amount,0);
+    const bal=ins-outs;
+    fEl.innerHTML=`
+      <div class="dash-fin-row"><div class="dash-fin-lbl">saldo</div><div class="dash-fin-val ${bal>=0?'pos':'neg'}">R$ ${fmt(Math.abs(bal))}</div></div>
+      <div class="dash-fin-row"><div class="dash-fin-lbl">receita</div><div class="dash-fin-val pos">R$ ${fmt(ins)}</div></div>
+      <div class="dash-fin-row"><div class="dash-fin-lbl">despesas</div><div class="dash-fin-val neg">R$ ${fmt(outs)}</div></div>`;
+  }
+
+  if(window._spiralStart)window._spiralStart();
+}
+
+/* ── SPIRAL CANVAS ── */
+(function(){
+  const canvas=document.getElementById('dash-spiral');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  let t=0,raf=null;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2,cy=H/2;
+    const arms=6,turns=3,pts=200;
+    for(let a=0;a<arms;a++){
+      const phase=(a/arms)*Math.PI*2;
+      ctx.beginPath();
+      for(let i=0;i<=pts;i++){
+        const p=i/pts;
+        const angle=p*turns*Math.PI*2+phase+t;
+        const r=p*Math.min(cx,cy)*0.9;
+        const wob=Math.sin(p*Math.PI*8+t*1.8+phase)*3;
+        const x=cx+(r+wob)*Math.cos(angle);
+        const y=cy+(r+wob)*Math.sin(angle)*0.5;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      const alpha=0.08+0.07*Math.sin(t*1.2+phase);
+      ctx.strokeStyle=`rgba(255,255,255,${alpha})`;
+      ctx.lineWidth=0.7;ctx.stroke();
+    }
+    // core glow
+    const g=ctx.createRadialGradient(cx,cy,0,cx,cy,18);
+    g.addColorStop(0,'rgba(255,255,255,0.15)');g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    t+=0.007;
+    raf=requestAnimationFrame(draw);
+  }
+  window._spiralStart=()=>{cancelAnimationFrame(raf);draw();};
+  window._spiralStop=()=>{cancelAnimationFrame(raf);raf=null;};
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden)window._spiralStop();
+    else if(curTab==='dashboard')window._spiralStart();
+  });
+})();
 
 /* ── DRAG ── */
 function initDrag(container){
@@ -1463,7 +1692,7 @@ function initDrag(container){
   window.addEventListener('mousemove',e=>{if(live)moveDrag(e.clientY);});
   window.addEventListener('mouseup',()=>{clearTimeout(holdTimer);if(live)endDrag();});
 }
-load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
+load();updateGreeting();updateXPBar();updateRing();renderDashboard();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
 </script>
 </body>
 </html>
