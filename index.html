@@ -232,6 +232,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .fin-row{display:flex;justify-content:space-between;padding:clamp(11px,2.2vw,14px) 0;border-bottom:1px solid var(--sep);}
 .fin-row-lbl{font-family:var(--mono);font-size:clamp(9px,2vw,10px);letter-spacing:0.1em;color:var(--t3);text-transform:uppercase;}
 .fin-row-val{font-family:var(--mono);font-size:clamp(13px,2.8vw,15px);font-weight:700;}
+.trans-del{background:none;border:none;color:rgba(255,255,255,0.18);font-size:16px;cursor:pointer;padding:4px 6px;line-height:1;flex-shrink:0;transition:color 0.15s;}
+.trans-del:active{color:rgba(255,80,80,0.8);}
 .val-save{color:rgba(255,255,255,0.62);}
 .avail-row{display:flex;justify-content:space-between;align-items:center;padding:clamp(11px,2.2vw,14px) 0;border-bottom:1px solid var(--sep);}
 .avail-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:clamp(13px,2.8vw,15px);font-weight:700;color:rgba(255,255,255,0.62);text-align:right;width:120px;}
@@ -393,18 +395,29 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 }
 
 /* ── DRAG & DROP ── */
-.task-list-wrap{user-select:none;-webkit-user-select:none;}
-.list-item{touch-action:pan-y;}
+.task-list-wrap{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+.list-item{will-change:transform;position:relative;}
 .list-item.drag-active{
+  z-index:50;
+  border-radius:12px;
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  -webkit-mask:radial-gradient(ellipse 96% 88% at 50% 50%,#000 60%,transparent 100%);
+  mask:radial-gradient(ellipse 96% 88% at 50% 50%,#000 60%,transparent 100%);
   opacity:0.95;
-  background:rgba(255,255,255,0.05);
-  border-radius:8px;
-  box-shadow:0 12px 40px rgba(0,0,0,0.7);
-  z-index:200;
 }
-/* transição suave quando as demais se movem */
-.list-item.drag-sibling{
-  transition:transform 0.18s cubic-bezier(0.34,1.1,0.64,1);
+.item-desc{
+  font-size:11px;
+  color:rgba(255,255,255,0.28);
+  font-family:var(--sans);
+  font-weight:400;
+  margin-top:2px;
+  line-height:1.4;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
 }
 
 /* ── FAB FLUTUANTE ── */
@@ -863,6 +876,7 @@ function renderTasks(){
       <div class="chk-c${t.done?' done':''}" style="${chkStyle}"></div>
       <div class="item-body">
         <div class="item-name${t.done?' done':''}">${t.name}${dueBadge?'&ensp;'+dueBadge:''}</div>
+        ${t.desc?`<div class="item-desc">${t.desc}</div>`:''}
         ${metaParts.length?`<div class="item-meta">${metaParts.join(' · ')}</div>`:''}
       </div>
       <button class="edit-btn" title="Editar">✎</button>`;
@@ -881,6 +895,23 @@ function toggleTask(id,row){
     chk.classList.add('done');nm.classList.add('done');
     chk.style.background=dot;chk.style.borderColor=dot;
     addXP(XP_T,chk);showToast('+'+XP_T+' XP');
+    // tarefas sem repetição somem após conclusão
+    if(!t.repeat||t.repeat==='once'){
+      row.style.transition='opacity 0.35s ease-out, transform 0.35s ease-out, max-height 0.4s ease-out';
+      row.style.maxHeight=row.offsetHeight+'px';
+      setTimeout(()=>{
+        row.style.opacity='0';
+        row.style.transform='translateX(18px)';
+        row.style.maxHeight='0';
+        row.style.marginBottom='0';
+        row.style.overflow='hidden';
+      },520);
+      setTimeout(()=>{
+        S.tasks=S.tasks.filter(x=>x.id!==id);
+        save();renderTasks();renderTaskFilters();updateRing();snapshotHistory();
+      },900);
+      return;
+    }
   }else{
     chk.classList.remove('done');nm.classList.remove('done');
     chk.style.background='';chk.style.borderColor=dot;
@@ -1015,15 +1046,23 @@ function renderFinance(animate){
     const cat=CATS.find(c=>c.id===t.cat);
     const bank=BANKS.find(b=>b.id===t.bank);
     const row=document.createElement('div');row.className='list-item';
+    row.dataset.tid=t.id;
     row.innerHTML=`
       <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:rgba(255,255,255,${t.type==='in'?'0.07':'0.03'});color:rgba(255,255,255,${t.type==='in'?'0.7':'0.35'})">${t.type==='in'?'↑':'↓'}</div>
       <div class="item-body">
         <div class="item-name">${t.name}</div>
         <div class="item-meta">${t.date}${cat?' · '+cat.name:''}${bank?' · <span style="color:'+bank.color+'">'+bank.name+'</span>':''}</div>
       </div>
-      <div class="fin-row-val ${t.type==='in'?'val-in':'val-out'}">${t.type==='in'?'+':'−'}R$ ${fmt(t.amount)}</div>`;
+      <div class="fin-row-val ${t.type==='in'?'val-in':'val-out'}">${t.type==='in'?'+':'−'}R$ ${fmt(t.amount)}</div>
+      <button class="trans-del" title="Remover" onclick="deleteTransaction(${t.id})">×</button>`;
     tl.appendChild(row);
   });
+}
+function deleteTransaction(id){
+  const idx=S.transactions.findIndex(x=>x.id===id);
+  if(idx===-1)return;
+  S.transactions.splice(idx,1);
+  save();renderFinance(true);
 }
 function updateSaving(){
   const v=parseFloat(document.getElementById('avail-input').value)||0;S.available=v;save();
@@ -1129,7 +1168,10 @@ function openModal(type,editId){
     title.textContent=isEdit?'Editar tarefa':'Nova tarefa';
     body.innerHTML=`
       <div class="m-field">
-        <input class="m-flat" id="m-name" placeholder="Descrição da tarefa" autocomplete="off" value="${t?t.name:''}">
+        <input class="m-flat" id="m-name" placeholder="Nome da tarefa" autocomplete="off" value="${t?t.name:''}">
+      </div>
+      <div class="m-field">
+        <textarea class="m-flat" id="m-desc" placeholder="Descrição (opcional)" rows="2" style="resize:none;line-height:1.5">${t&&t.desc?t.desc:''}</textarea>
       </div>
       <div class="m-field">
         <div class="m-field-label">Tag</div>
@@ -1256,9 +1298,10 @@ function saveTask(){
   const prioEl=document.querySelector('#m-body .m-pills .m-pill.sel');
   const prio=prioEl&&prioEl.textContent.trim()==='Alta'?'alta':'normal';
   const due=document.getElementById('m-due')?document.getElementById('m-due').value||null:null;
+  const desc=(document.getElementById('m-desc')?.value||'').trim();
   const days=mRepeat==='daily'?[0,1,2,3,4,5,6]:mRepeat==='once'?[]:mDays;
-  if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.tag=tag;t.color=mColor;t.priority=prio;t.due=due;t.repeat=mRepeat;t.days=[...days];}}
-  else S.tasks.push({id:Date.now(),name,tag,color:mColor,priority:prio,due,repeat:mRepeat,days:[...days],done:false});
+  if(mEditId){const t=S.tasks.find(x=>x.id===mEditId);if(t){t.name=name;t.desc=desc;t.tag=tag;t.color=mColor;t.priority=prio;t.due=due;t.repeat=mRepeat;t.days=[...days];}}
+  else S.tasks.push({id:Date.now(),name,desc,tag,color:mColor,priority:prio,due,repeat:mRepeat,days:[...days],done:false});
   save();closeModal();renderTasks();renderTaskFilters();updateRing();
 }
 function saveFinance(type){
@@ -1289,205 +1332,136 @@ function updateFab(){
   else{fab.classList.add('hidden');}
 }
 
-/* ── DRAG REAL — item se move, demais abrem espaço ── */
+/* ── DRAG ── */
 function initDrag(container){
-  let dragged=null,draggedH=0,startY=0,currentY=0,holdTimer=null,active=false,insertBefore=null;
+  const fresh=container.cloneNode(true);
+  container.parentNode.replaceChild(fresh,container);
+  container=fresh;
+  container.querySelectorAll('.list-item[data-id]').forEach(row=>{
+    const id=parseInt(row.dataset.id);
+    row.querySelector('.chk-c')?.addEventListener('click',e=>{e.stopPropagation();toggleTask(id,row);});
+    row.querySelector('.edit-btn')?.addEventListener('click',e=>{e.stopPropagation();openModal('task',id);});
+  });
 
-  function getItems(){
-    return [...container.querySelectorAll('.list-item[data-id]')];
-  }
+  let dragging=null,holdTimer=null,live=false,startY=0;
+  // snap: posição original de cada item (sem translateY aplicado)
+  let snap=[];
 
-  function getClientY(e){
-    return e.touches?e.touches[0].clientY:e.clientY;
-  }
+  function rows(){ return [...container.querySelectorAll('.list-item[data-id]')]; }
 
-  function beginDrag(e, row){
-    active=true;
-    dragged=row;
-    draggedH=row.offsetHeight;
-    startY=getClientY(e);
-    currentY=startY;
-
-    // fixa o item visualmente no lugar mas tira do fluxo
-    const rect=row.getBoundingClientRect();
-    row.style.cssText=`
-      position:fixed;
-      top:${rect.top}px;
-      left:${rect.left}px;
-      width:${rect.width}px;
-      height:${draggedH}px;
-      z-index:200;
-      margin:0;
-      pointer-events:none;
-    `;
-    row.classList.add('drag-active');
-
-    // adiciona classe de transição nas irmãs
-    getItems().forEach(r=>{ if(r!==dragged) r.classList.add('drag-sibling'); });
-
-    navigator.vibrate&&navigator.vibrate(25);
-    shiftSiblings();
-  }
-
-  // desloca as irmãs para abrir/fechar espaço em tempo real
-  function shiftSiblings(){
-    if(!dragged)return;
-    const items=getItems();
-    const draggedOrigIdx=items.indexOf(dragged); // posição DOM atual (fixo, não muda)
-
-    // centro vertical do item arrastado
-    const dragTop=parseFloat(dragged.style.top);
-    const dragMid=dragTop+draggedH/2;
-
-    // achar onde inserir: qual item está sendo passado por cima
-    insertBefore=null;
-    let insertIdx=items.length; // padrão: final
-
-    for(let i=0;i<items.length;i++){
-      const r=items[i];
-      if(r===dragged)continue;
-      const b=r.getBoundingClientRect();
-      // usa posição sem transform para calcular posição original
-      const origTop=b.top - (r._shift||0);
-      const origMid=origTop+b.height/2;
-      if(dragMid<origMid){
-        insertBefore=r;
-        insertIdx=i;
-        break;
-      }
-    }
-
-    // aplica deslocamento nas irmãs
-    let slotIdx=insertBefore ? items.indexOf(insertBefore) : items.length;
-    // se inserir antes de um item que vem depois do arrastado → shift para baixo
-    // se inserir antes de um item que vem antes do arrastado → shift para cima
-
-    items.forEach((r,i)=>{
-      if(r===dragged)return;
-      let shift=0;
-      // determine posição original do item (sem dragged)
-      const origI = i > items.indexOf(dragged) ? i-1 : i;
-      if(origI>=slotIdx && i>items.indexOf(dragged)){
-        shift=draggedH; // move para baixo (abre espaço)
-      }else if(origI<slotIdx && i<items.indexOf(dragged)){
-        shift=-draggedH; // move para cima
-      }
-      r._shift=shift;
-      r.style.transform=shift?`translateY(${shift}px)`:'';
+  function startDrag(clientY,row){
+    live=true; dragging=row; startY=clientY;
+    // captura midY real de cada item antes de qualquer translate
+    snap=rows().map(r=>{
+      const rect=r.getBoundingClientRect();
+      return {el:r, midY:rect.top+rect.height/2, h:rect.height};
     });
+    row.style.zIndex='50';
+    row.style.boxShadow='0 10px 36px rgba(0,0,0,0.7)';
+    row.classList.add('drag-active');
+    navigator.vibrate&&navigator.vibrate(18);
   }
 
-  function moveDrag(e){
-    if(!active||!dragged)return;
-    if(e.cancelable)e.preventDefault();
-    const y=getClientY(e);
-    const dy=y-startY;
-    dragged.style.top=(parseFloat(dragged.style.top)+(y-currentY))+'px';
-    currentY=y;
-    shiftSiblings();
+  function moveDrag(clientY){
+    if(!live||!dragging) return;
+    const dy=clientY-startY;
+    // move o item arrastado
+    dragging.style.transition='none';
+    dragging.style.transform=`translateY(${dy}px)`;
+
+    // midY atual do item arrastado (original + deslocamento)
+    const dragSnap=snap.find(s=>s.el===dragging);
+    if(!dragSnap) return;
+    const dragCurMid=dragSnap.midY+dy;
+    const dragH=dragSnap.h;
+
+    // para cada vizinho: decide se deve ceder espaço baseado APENAS nos snaps originais
+    snap.forEach(s=>{
+      if(s.el===dragging) return;
+      s.el.style.transition='transform 0.16s ease-out';
+      // item está abaixo da origem e o cursor passou pelo seu meio → sobe
+      if(s.midY>dragSnap.midY && dragCurMid>s.midY){
+        s.el.style.transform=`translateY(-${dragH}px)`;
+      // item está acima da origem e o cursor passou pelo seu meio → desce
+      }else if(s.midY<dragSnap.midY && dragCurMid<s.midY){
+        s.el.style.transform=`translateY(${dragH}px)`;
+      }else{
+        s.el.style.transform='translateY(0)';
+      }
+    });
   }
 
   function endDrag(){
-    if(!active||!dragged)return;
-    active=false;
+    if(!live||!dragging) return;
+    live=false;
 
-    // anima o item para a posição final (onde o placeholder abriu espaço)
-    // calcula para onde ele vai
-    const items=getItems();
-    const dragIdx=items.indexOf(dragged);
+    const dragSnap=snap.find(s=>s.el===dragging);
+    const dy=parseFloat(dragging.style.transform.replace('translateY(',''))||0;
+    const dragCurMid=(dragSnap?.midY||0)+dy;
 
-    // posição alvo: onde insertBefore está (com shift aplicado) ou fim
-    let targetTop;
-    if(insertBefore){
-      const ib=insertBefore.getBoundingClientRect();
-      const ibShift=insertBefore._shift||0;
-      targetTop=ib.top-ibShift; // posição original do insertBefore
-    }else{
-      // vai para o final
-      const last=items.filter(r=>r!==dragged).pop();
-      if(last){
-        const lb=last.getBoundingClientRect();
-        targetTop=lb.top+(last._shift||0)+last.offsetHeight;
-      }else{
-        targetTop=parseFloat(dragged.style.top);
-      }
+    // acha onde inserir no DOM usando snaps originais
+    let insertBefore=null;
+    for(const s of snap){
+      if(s.el===dragging) continue;
+      if(dragCurMid<s.midY){ insertBefore=s.el; break; }
     }
 
-    // anima até lá
-    dragged.style.transition='top 0.2s cubic-bezier(0.34,1.1,0.64,1)';
-    dragged.style.top=targetTop+'px';
+    // 1. move no DOM AGORA (antes de limpar qualquer estilo)
+    if(insertBefore) container.insertBefore(dragging,insertBefore);
+    else container.appendChild(dragging);
 
-    // zera shifts das irmãs imediatamente (elas "viram" para posição real)
-    items.forEach(r=>{
-      if(r===dragged)return;
-      r.style.transition='none';
-      r.style.transform='';
-      r._shift=0;
-      r.classList.remove('drag-sibling');
+    // 2. zera transforms de todos com transição suave sem overshoot
+    rows().forEach(r=>{
+      r.style.transition='transform 0.22s ease-out, box-shadow 0.18s ease-out';
+      r.style.transform='translateY(0)';
     });
+    dragging.style.boxShadow='none';
 
+    // 3. limpa estilos após animação terminar
     setTimeout(()=>{
-      // restaura o item no DOM na nova posição
-      dragged.style.cssText='';
-      dragged.style.transition='';
-      dragged.classList.remove('drag-active');
-
-      // insere no DOM na posição correta
-      if(insertBefore){
-        container.insertBefore(dragged,insertBefore);
-      }else{
-        container.appendChild(dragged);
-      }
-
-      // sincroniza S.tasks com a nova ordem visual
-      const newOrder=getItems().map(r=>parseInt(r.dataset.id));
+      rows().forEach(r=>{
+        r.style.cssText='';
+        r.classList.remove('drag-active');
+      });
+      // persiste ordem
+      const order=rows().map(r=>parseInt(r.dataset.id));
       S.tasks.sort((a,b)=>{
-        const ai=newOrder.indexOf(a.id);
-        const bi=newOrder.indexOf(b.id);
-        if(ai===-1)return 1;if(bi===-1)return -1;
-        return ai-bi;
+        const ai=order.indexOf(a.id),bi=order.indexOf(b.id);
+        return (ai<0?9999:ai)-(bi<0?9999:bi);
       });
       save();
-
-      dragged=null;insertBefore=null;
-    },210);
+      dragging=null; snap=[];
+    },220);
   }
 
-  // ── TOUCH ──
+  function cancel(){
+    clearTimeout(holdTimer);
+    if(!live) return;
+    live=false;
+    rows().forEach(r=>{ r.style.cssText=''; r.classList.remove('drag-active'); });
+    dragging=null; snap=[];
+  }
+
   container.addEventListener('touchstart',e=>{
     const row=e.target.closest('.list-item[data-id]');
-    if(!row||e.target.closest('.chk-c,.edit-btn'))return;
-    // bloqueia seleção de texto
-    e.preventDefault();
-    holdTimer=setTimeout(()=>beginDrag(e,row),380);
-  },{passive:false});
-
+    if(!row||e.target.closest('.chk-c,.chk-s,.edit-btn')) return;
+    holdTimer=setTimeout(()=>startDrag(e.touches[0].clientY,row),300);
+  },{passive:true});
   container.addEventListener('touchmove',e=>{
-    if(!active){clearTimeout(holdTimer);return;}
-    moveDrag(e);
+    if(!live){clearTimeout(holdTimer);return;}
+    if(e.cancelable)e.preventDefault();
+    moveDrag(e.touches[0].clientY);
   },{passive:false});
+  container.addEventListener('touchend',()=>{clearTimeout(holdTimer);endDrag();});
+  container.addEventListener('touchcancel',()=>cancel());
 
-  container.addEventListener('touchend',()=>{
-    clearTimeout(holdTimer);
-    if(active)endDrag();
-  },{passive:true});
-
-  container.addEventListener('touchcancel',()=>{
-    clearTimeout(holdTimer);
-    if(active)endDrag();
-  },{passive:true});
-
-  // ── MOUSE (desktop) ──
   container.addEventListener('mousedown',e=>{
     const row=e.target.closest('.list-item[data-id]');
-    if(!row||e.target.closest('.chk-c,.edit-btn'))return;
-    holdTimer=setTimeout(()=>beginDrag(e,row),300);
+    if(!row||e.target.closest('.chk-c,.chk-s,.edit-btn')) return;
+    holdTimer=setTimeout(()=>startDrag(e.clientY,row),250);
   });
-  window.addEventListener('mousemove',e=>{if(active)moveDrag(e);});
-  window.addEventListener('mouseup',()=>{
-    clearTimeout(holdTimer);
-    if(active)endDrag();
-  });
+  window.addEventListener('mousemove',e=>{if(live)moveDrag(e.clientY);});
+  window.addEventListener('mouseup',()=>{clearTimeout(holdTimer);if(live)endDrag();});
 }
 load();updateXPBar();updateRing();renderHabits();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
 </script>
