@@ -365,7 +365,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .item-due.over{color:rgba(255,90,80,0.85);}
 
 /* ── DASHBOARD ── */
-#dash-spiral{display:block;margin:0 auto 28px;opacity:0.85;}
+#dash-spiral{display:block;margin:0 auto 28px;opacity:0.85;cursor:grab;}
+#dash-spiral:active{cursor:grabbing;}
 .dash-greet{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--t4);text-transform:uppercase;margin-bottom:4px;}
 .dash-name{font-size:clamp(22px,6vw,30px);font-weight:600;color:var(--t1);letter-spacing:-0.02em;margin-bottom:28px;}
 .dash-divider{height:1px;background:var(--sep);margin:18px 0;}
@@ -374,6 +375,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .dash-row-name{font-size:13px;color:var(--t2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dash-row-meta{font-family:var(--mono);font-size:10px;color:var(--t4);flex-shrink:0;margin-left:10px;}
 .dash-row-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-right:10px;margin-bottom:1px;}
+.dash-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;}
+.dash-chart-wide{grid-column:1/-1;}
+.dash-chart-cell{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px 10px;position:relative;}
+.dc-label{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;color:var(--t4);text-transform:uppercase;margin-bottom:8px;}
+.dc-canvas{display:block;width:100%;}
 .dash-empty{font-family:var(--mono);font-size:9px;color:var(--t4);letter-spacing:0.1em;}
 .dash-fin-row{display:flex;justify-content:space-between;margin-bottom:8px;}
 .dash-fin-lbl{font-size:13px;color:var(--t2);}
@@ -507,9 +513,78 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 #toast.show{transform:translateX(-50%) translateY(0);}
 .xp-pop{position:fixed;z-index:998;font-family:var(--mono);font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);pointer-events:none;animation:floatUp 1.1s ease-out forwards;}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-48px)}}
+
+/* ── INTRO ── */
+#app{opacity:0;}
+#app.app-visible{opacity:1;transition:opacity 0.5s ease;}
+
+#intro-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  transition:opacity 0.55s ease;
+}
+#intro-screen.out{opacity:0;}
+#intro-screen.gone{display:none;}
+
+#intro-inner{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  text-align:center;
+}
+#intro-greeting{
+  font-family:var(--mono);
+  font-size:clamp(11px,3vw,13px);
+  letter-spacing:0.32em;
+  color:rgba(255,255,255,0.28);
+  text-transform:uppercase;
+  min-height:20px;
+  opacity:0;
+  transition:opacity 0.3s;
+}
+#intro-greeting.show{opacity:1;}
+#intro-greeting .cursor{
+  display:inline-block;
+  width:1px;height:1em;
+  background:rgba(255,255,255,0.3);
+  margin-left:2px;vertical-align:text-bottom;
+  animation:blinkC 0.8s step-end infinite;
+}
+@keyframes blinkC{0%,100%{opacity:1}50%{opacity:0}}
+#intro-name{
+  font-size:clamp(26px,7vw,38px);
+  font-weight:300;
+  color:var(--t1);
+  letter-spacing:-0.02em;
+  margin-top:8px;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity 0.45s ease, transform 0.45s ease;
+}
+#intro-name.show{opacity:1;transform:translateY(0);}
+#intro-logo{
+  font-family:var(--mono);
+  font-size:8px;
+  letter-spacing:0.38em;
+  color:rgba(255,255,255,0.18);
+  text-transform:uppercase;
+  margin-top:22px;
+  opacity:0;
+  transition:opacity 0.4s;
+}
+#intro-logo.show{opacity:1;}
 </style>
 </head>
 <body>
+<!-- INTRO -->
+<div id="intro-screen">
+  <div id="intro-inner">
+    <div id="intro-greeting"></div>
+    <div id="intro-name"></div>
+    <div id="intro-logo">aurea</div>
+  </div>
+</div>
+
 <div id="app">
 
   <!-- HEADER -->
@@ -534,18 +609,23 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div id="content" style="padding-bottom:calc(90px + var(--sb))">
 
     <div id="sec-dashboard" class="section active">
-      <canvas id="dash-spiral" width="260" height="100"></canvas>
+      <canvas id="dash-spiral" width="300" height="200"></canvas>
       <div class="dash-greet" id="dash-greet-line">bom dia</div>
       <div class="dash-name" id="dash-name-big">—</div>
-      <div class="dash-divider"></div>
-      <div class="dash-section-lbl">hábitos de hoje</div>
-      <div id="dash-habits"></div>
-      <div class="dash-divider"></div>
-      <div class="dash-section-lbl">tarefas pendentes</div>
-      <div id="dash-tasks"></div>
-      <div class="dash-divider"></div>
-      <div class="dash-section-lbl">finanças</div>
-      <div id="dash-finance"></div>
+      <div class="dash-charts-grid">
+        <div class="dash-chart-cell" id="dc-habits">
+          <div class="dc-label">hábitos</div>
+          <canvas class="dc-canvas" id="cv-habits" height="72"></canvas>
+        </div>
+        <div class="dash-chart-cell" id="dc-tasks">
+          <div class="dc-label">tarefas</div>
+          <canvas class="dc-canvas" id="cv-tasks" height="72"></canvas>
+        </div>
+        <div class="dash-chart-cell dash-chart-wide" id="dc-finance">
+          <div class="dc-label">saldo</div>
+          <canvas class="dc-canvas" id="cv-finance" height="72"></canvas>
+        </div>
+      </div>
     </div>
 
     <div id="sec-habitos" class="section">
@@ -641,7 +721,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 
 <!-- FAB FLUTUANTE -->
-<div id="fab-wrap">
+<div id="fab-wrap" class="hidden">
   <button id="fab-btn" onclick="onFabClick()">+</button>
 </div>
 
@@ -723,7 +803,7 @@ const REPEAT_TYPES=[
   {id:'once',    label:'Uma vez'},
 ];
 let S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''};
-let mDays=[0,1,2,3,4,5,6],mType='',mEditId=null,mColor=TAG_COLORS[0],mRepeat='daily',curTab='habitos',curPd='week';
+let mDays=[0,1,2,3,4,5,6],mType='',mEditId=null,mColor=TAG_COLORS[0],mRepeat='daily',curTab='dashboard',curPd='week';
 let habitFilter='all',taskFilter='all';
 
 function save(){try{localStorage.setItem('aurea_v5',JSON.stringify(S));}catch(e){}}
@@ -1451,10 +1531,10 @@ function onFabClick(){
 function updateFab(){
   const fab=document.getElementById('fab-wrap');
   if(!fab)return;
-  if(curTab==='habitos'||curTab==='tarefas'){fab.classList.remove('hidden');}
+  if(curTab==='habitos'){fab.classList.remove('hidden');}
   else{fab.classList.add('hidden');}
   const lbl=document.getElementById('fab-label');
-  if(lbl)lbl.textContent=curTab==='tarefas'?'+ nova tarefa':'+ novo hábito';
+  if(lbl)lbl.textContent='+ novo hábito';
 }
 function fabAction(){
   if(curTab==='habitos')openModal('habit',null);
@@ -1470,89 +1550,301 @@ function renderDashboard(){
   const today=new Date().toDateString();
   const todayDow=new Date().getDay();
 
-  // hábitos de hoje
-  const hEl=document.getElementById('dash-habits');
-  if(hEl){
-    const todayH=S.habits.filter(h=>!h.days||h.days.includes(todayDow));
-    if(!todayH.length){hEl.innerHTML='<div class="dash-empty">nenhum hábito para hoje</div>';}
-    else{
-      hEl.innerHTML='';
-      todayH.slice(0,5).forEach(h=>{
-        const done=h.done&&h.done[today];
-        const row=document.createElement('div');row.className='dash-row';
-        row.innerHTML=`<div class="dash-row-dot" style="background:${h.color||'rgba(255,255,255,0.25)'}"></div><div class="dash-row-name" style="${done?'text-decoration:line-through;opacity:0.35':''}">${h.name}</div><div class="dash-row-meta">${done?'✓':'–'}</div>`;
-        hEl.appendChild(row);
-      });
-      if(todayH.length>5){const m=document.createElement('div');m.className='dash-empty';m.style.marginTop='6px';m.textContent='+${todayH.length-5} mais';hEl.appendChild(m);}
+  // ── chart helpers ──
+  function drawRadialBars(cv,items,doneKey){
+    if(!cv)return;
+    const W=cv.offsetWidth||cv.parentElement?.clientWidth||120;
+    cv.width=W;const H=cv.height;
+    const ctx=cv.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    if(!items.length){
+      ctx.font='8px monospace';ctx.fillStyle='rgba(255,255,255,0.15)';ctx.textAlign='center';
+      ctx.fillText('—',W/2,H/2+3);return;
     }
+    const cx=W/2,cy=H/2+4,maxR=Math.min(cx,cy)-6;
+    const n=Math.min(items.length,8);
+    items.slice(0,n).forEach((item,i)=>{
+      const r=maxR*(0.4+0.6*(i+1)/n);
+      const done=doneKey?item[doneKey]:item.done;
+      const col=item.color||'rgba(255,255,255,0.5)';
+      // track
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=2.5;ctx.stroke();
+      if(done){
+        // filled arc
+        ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);
+        ctx.strokeStyle=col;ctx.globalAlpha=0.7;ctx.lineWidth=2.5;ctx.stroke();ctx.globalAlpha=1;
+      }
+    });
+    // center dot
+    ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fill();
   }
 
-  // tarefas pendentes
-  const tEl=document.getElementById('dash-tasks');
-  if(tEl){
-    const pending=S.tasks.filter(t=>!t.done);
-    if(!pending.length){tEl.innerHTML='<div class="dash-empty">sem tarefas pendentes</div>';}
-    else{
-      tEl.innerHTML='';
-      pending.slice(0,5).forEach(t=>{
-        const row=document.createElement('div');row.className='dash-row';
-        let meta=t.priority==='alta'?'alta':'';
-        if(t.due){const d=new Date(t.due+'T00:00:00');const now=new Date();now.setHours(0,0,0,0);const diff=Math.round((d-now)/864e5);meta=diff<0?'atrasada':diff===0?'hoje':diff===1?'amanhã':meta;}
-        row.innerHTML=`<div class="dash-row-dot" style="background:${t.color||'rgba(255,255,255,0.25)'}"></div><div class="dash-row-name">${t.name}</div><div class="dash-row-meta">${meta}</div>`;
-        tEl.appendChild(row);
-      });
+  function drawTaskBubbles(cv,tasks){
+    if(!cv)return;
+    const W=cv.offsetWidth||cv.parentElement?.clientWidth||120;
+    cv.width=W;const H=cv.height;
+    const ctx=cv.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    if(!tasks.length){
+      ctx.font='8px monospace';ctx.fillStyle='rgba(255,255,255,0.15)';ctx.textAlign='center';
+      ctx.fillText('—',W/2,H/2+3);return;
     }
+    const total=tasks.length,done=tasks.filter(t=>t.done).length;
+    // background arc ring
+    const cx=W/2,cy=H/2+4,r=Math.min(cx,cy)-8;
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=8;ctx.stroke();
+    // filled portion
+    const frac=total?done/total:0;
+    if(frac>0){
+      ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+frac*Math.PI*2);
+      ctx.strokeStyle='rgba(255,255,255,0.45)';ctx.lineWidth=8;ctx.lineCap='round';ctx.stroke();
+    }
+    // number in center
+    ctx.font=`bold ${Math.round(H*0.3)}px monospace`;ctx.fillStyle='rgba(255,255,255,0.75)';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(`${done}/${total}`,cx,cy);
   }
 
-  // finanças
-  const fEl=document.getElementById('dash-finance');
-  if(fEl){
-    const ins=S.transactions.filter(t=>t.type==='in').reduce((a,t)=>a+t.amount,0);
-    const outs=S.transactions.filter(t=>t.type==='out').reduce((a,t)=>a+t.amount,0);
-    const bal=ins-outs;
-    fEl.innerHTML=`
-      <div class="dash-fin-row"><div class="dash-fin-lbl">saldo</div><div class="dash-fin-val ${bal>=0?'pos':'neg'}">R$ ${fmt(Math.abs(bal))}</div></div>
-      <div class="dash-fin-row"><div class="dash-fin-lbl">receita</div><div class="dash-fin-val pos">R$ ${fmt(ins)}</div></div>
-      <div class="dash-fin-row"><div class="dash-fin-lbl">despesas</div><div class="dash-fin-val neg">R$ ${fmt(outs)}</div></div>`;
+  function drawFinanceLine(cv,transactions){
+    if(!cv)return;
+    const W=cv.offsetWidth||cv.parentElement?.clientWidth||260;
+    cv.width=W;const H=cv.height;
+    const ctx=cv.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    // build running balance over last 8 transactions (or all)
+    const sorted=[...transactions].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const last=sorted.slice(-12);
+    if(!last.length){
+      ctx.font='8px monospace';ctx.fillStyle='rgba(255,255,255,0.15)';ctx.textAlign='center';
+      ctx.fillText('sem movimentações',W/2,H/2+3);return;
+    }
+    let running=0;
+    const pts=last.map(t=>{running+=t.type==='in'?t.amount:-t.amount;return running;});
+    const minV=Math.min(...pts),maxV=Math.max(...pts);
+    const pad={l:10,r:10,t:8,b:8};
+    const range=maxV-minV||1;
+    const toY=v=>pad.t+(1-(v-minV)/range)*(H-pad.t-pad.b);
+    const toX=i=>pad.l+i*(W-pad.l-pad.r)/(pts.length-1||1);
+    // zero line
+    const zy=toY(0);
+    ctx.beginPath();ctx.moveTo(pad.l,zy);ctx.lineTo(W-pad.r,zy);
+    ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.stroke();ctx.setLineDash([]);
+    // fill under curve
+    ctx.beginPath();ctx.moveTo(toX(0),toY(pts[0]));
+    pts.forEach((_,i)=>{if(i>0)ctx.lineTo(toX(i),toY(pts[i]));});
+    ctx.lineTo(toX(pts.length-1),H-pad.b);ctx.lineTo(toX(0),H-pad.b);ctx.closePath();
+    const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+    grad.addColorStop(0,'rgba(255,255,255,0.12)');grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=grad;ctx.fill();
+    // line
+    ctx.beginPath();ctx.moveTo(toX(0),toY(pts[0]));
+    pts.forEach((_,i)=>{if(i>0)ctx.lineTo(toX(i),toY(pts[i]));});
+    const lastVal=pts[pts.length-1];
+    ctx.strokeStyle=lastVal>=0?'rgba(150,255,180,0.7)':'rgba(255,110,100,0.7)';
+    ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.stroke();
+    // dots
+    pts.forEach((v,i)=>{
+      ctx.beginPath();ctx.arc(toX(i),toY(v),2.2,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fill();
+    });
   }
+
+  // ── hábitos chart ──
+  const todayH=S.habits.filter(h=>!h.days||h.days.includes(todayDow));
+  const habItems=todayH.map(h=>({...h,_done:!!(h.done&&h.done[today]),color:h.color}));
+  const cvH=document.getElementById('cv-habits');
+  if(cvH) requestAnimationFrame(()=>drawRadialBars(cvH,habItems.map(h=>({...h,done:h._done})),null));
+
+  // ── tarefas chart ──
+  const cvT=document.getElementById('cv-tasks');
+  if(cvT) requestAnimationFrame(()=>drawTaskBubbles(cvT,S.tasks));
+
+  // ── finanças chart ──
+  const cvF=document.getElementById('cv-finance');
+  if(cvF) requestAnimationFrame(()=>drawFinanceLine(cvF,S.transactions));
 
   if(window._spiralStart)window._spiralStart();
 }
 
-/* ── SPIRAL CANVAS ── */
-(function(){
-  const canvas=document.getElementById('dash-spiral');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height;
-  let t=0,raf=null;
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    const cx=W/2,cy=H/2;
-    const arms=6,turns=3,pts=200;
-    for(let a=0;a<arms;a++){
-      const phase=(a/arms)*Math.PI*2;
-      ctx.beginPath();
-      for(let i=0;i<=pts;i++){
-        const p=i/pts;
-        const angle=p*turns*Math.PI*2+phase+t;
-        const r=p*Math.min(cx,cy)*0.9;
-        const wob=Math.sin(p*Math.PI*8+t*1.8+phase)*3;
-        const x=cx+(r+wob)*Math.cos(angle);
-        const y=cy+(r+wob)*Math.sin(angle)*0.5;
-        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+/* ── NEURAL NET 3D ── */
+(()=>{
+  const cv=document.getElementById('dash-spiral');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  let raf=null;
+
+  function resize(){
+    const W=cv.parentElement?.clientWidth||300;
+    cv.width=Math.min(W,420);
+    cv.height=Math.round(cv.width*0.58);
+  }
+  resize();
+
+  const N=56;
+  const nodes=[];
+  const rng=(()=>{let s=42;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;}})();
+
+  function makeNode(i,total){
+    const phi=Math.acos(1-2*(i+0.5)/total);
+    const theta=(Math.PI*(1+Math.sqrt(5)))*i;
+    const r=0.66+rng()*0.34;
+    return{
+      x:r*Math.sin(phi)*Math.cos(theta),
+      y:r*Math.sin(phi)*Math.sin(theta),
+      z:r*Math.cos(phi),
+      pulse:rng()*Math.PI*2,
+      speed:0.4+rng()*0.8,
+      size:0.8+rng()*1.5,
+      alpha:1,          // current opacity
+      state:'alive',    // alive | dying | spawning
+      stateT:0,
+    };
+  }
+  for(let i=0;i<N;i++) nodes.push(makeNode(i,N));
+
+  function buildEdges(){
+    const e=[];const D2=0.55*0.55;
+    for(let i=0;i<nodes.length;i++){
+      if(nodes[i].state==='dying'&&nodes[i].alpha<0.05) continue;
+      for(let j=i+1;j<nodes.length;j++){
+        if(nodes[j].state==='dying'&&nodes[j].alpha<0.05) continue;
+        const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,dz=nodes[i].z-nodes[j].z;
+        if(dx*dx+dy*dy+dz*dz<D2) e.push([i,j]);
       }
-      const alpha=0.08+0.07*Math.sin(t*1.2+phase);
-      ctx.strokeStyle=`rgba(255,255,255,${alpha})`;
-      ctx.lineWidth=0.7;ctx.stroke();
     }
-    // core glow
-    const g=ctx.createRadialGradient(cx,cy,0,cx,cy,18);
-    g.addColorStop(0,'rgba(255,255,255,0.15)');g.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
-    t+=0.007;
+    return e;
+  }
+
+  let rotX=0.28,rotY=0;
+  let velY=0.0028;
+  let isDragging=false,lastMX=0,lastMY=0,dragVX=0,dragVY=0;
+
+  // node birth/death cycle
+  let nextMorphT=4.0; // seconds until next morph
+
+  function project(x,y,z,W,H){
+    const cosY=Math.cos(rotY),sinY=Math.sin(rotY);
+    const x1=x*cosY+z*sinY,z1=-x*sinY+z*cosY;
+    const cosX=Math.cos(rotX),sinX=Math.sin(rotX);
+    const y2=y*cosX-z1*sinX,z2=y*sinX+z1*cosX;
+    const fov=2.6,scale=W*0.30;
+    const persp=fov/(fov+z2);
+    return{sx:W/2+x1*scale*persp,sy:H/2+y2*scale*persp,persp,z:z2};
+  }
+
+  let t=0;
+  function draw(){
+    const W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+
+    // morph cycle
+    nextMorphT-=0.016;
+    if(nextMorphT<=0){
+      // pick 2-4 alive nodes to kill
+      const alive=nodes.filter(n=>n.state==='alive');
+      const kill=Math.min(3,Math.floor(alive.length*0.08)+1);
+      for(let k=0;k<kill;k++){
+        const idx=Math.floor(rng()*alive.length);
+        if(alive[idx]){alive[idx].state='dying';alive[idx].stateT=0;}
+        alive.splice(idx,1);
+      }
+      // spawn same count in new random positions
+      for(let k=0;k<kill;k++){
+        const phi=Math.acos(1-2*rng());
+        const theta=rng()*Math.PI*2;
+        const r=0.64+rng()*0.36;
+        const dead=nodes.findIndex(n=>n.state==='dying'&&n.alpha<0.05);
+        const nn={
+          x:r*Math.sin(phi)*Math.cos(theta),
+          y:r*Math.sin(phi)*Math.sin(theta),
+          z:r*Math.cos(phi),
+          pulse:rng()*Math.PI*2,speed:0.4+rng()*0.8,size:0.8+rng()*1.5,
+          alpha:0,state:'spawning',stateT:0,
+        };
+        if(dead>=0) nodes[dead]=nn; else nodes.push(nn);
+      }
+      nextMorphT=2.5+rng()*3.5;
+    }
+
+    // update alpha for dying/spawning
+    nodes.forEach(n=>{
+      if(n.state==='dying'){n.alpha=Math.max(0,n.alpha-0.018);}
+      else if(n.state==='spawning'){n.alpha=Math.min(1,n.alpha+0.022);if(n.alpha>=1)n.state='alive';}
+    });
+
+    const edges=buildEdges();
+    const proj=nodes.map(n=>({...project(n.x,n.y,n.z,W,H),pulse:n.pulse,speed:n.speed,size:n.size,alpha:n.alpha}));
+
+    const edgesSorted=edges.map(([i,j])=>({i,j,az:(proj[i].z+proj[j].z)/2})).sort((a,b)=>a.az-b.az);
+    for(const{i,j}of edgesSorted){
+      const a=proj[i],b=proj[j];
+      const dx=a.sx-b.sx,dy=a.sy-b.sy;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const edgeA=Math.min(a.alpha,b.alpha);
+      const alpha=(0.04+0.09*((a.persp+b.persp)/2)*Math.max(0,1-dist/150))*edgeA;
+      ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);
+      ctx.strokeStyle=`rgba(255,255,255,${alpha})`;ctx.lineWidth=0.5;ctx.stroke();
+    }
+
+    const order=[...proj.keys()].sort((a,b)=>proj[a].z-proj[b].z);
+    for(const idx of order){
+      const p=proj[idx],n=nodes[idx];
+      if(p.alpha<0.01) continue;
+      const flicker=0.5+0.5*Math.sin(t*n.speed+n.pulse);
+      const brightness=(0.18+0.44*flicker*p.persp)*p.alpha;
+      const r=Math.max(0.5,(n.size*p.persp)*1.6);
+      if(p.z>0.1&&p.alpha>0.3){
+        const gr=r*3.5;
+        const g=ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,gr);
+        g.addColorStop(0,`rgba(255,255,255,${brightness*0.22})`);g.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.beginPath();ctx.arc(p.sx,p.sy,gr,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(p.sx,p.sy,r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${brightness})`;ctx.fill();
+    }
+
+    const cf=0.06+0.04*Math.sin(t*0.9);
+    const cg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,20);
+    cg.addColorStop(0,`rgba(255,255,255,${cf})`);cg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.arc(W/2,H/2,20,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();
+
+    if(!isDragging){
+      rotY+=velY+dragVX;rotX+=dragVY;
+      dragVX*=0.93;dragVY*=0.93;
+      rotX=rotX*0.996+0.28*0.004;
+    }
+    t+=0.016;
     raf=requestAnimationFrame(draw);
   }
+
+  function onDown(e){
+    isDragging=true;dragVX=0;dragVY=0;
+    const pt=e.touches?e.touches[0]:e;
+    lastMX=pt.clientX;lastMY=pt.clientY;
+    if(e.cancelable)e.preventDefault();
+  }
+  function onMove(e){
+    if(!isDragging)return;
+    const pt=e.touches?e.touches[0]:e;
+    // X invertido: sinal negativo no dragVX
+    dragVX=-(pt.clientX-lastMX)*0.013;dragVY=(pt.clientY-lastMY)*0.009;
+    rotY+=dragVX;rotX+=dragVY;
+    lastMX=pt.clientX;lastMY=pt.clientY;
+    if(e.cancelable)e.preventDefault();
+  }
+  function onUp(){isDragging=false;}
+
+  cv.addEventListener('mousedown',onDown);
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',onUp);
+  cv.addEventListener('touchstart',onDown,{passive:false});
+  cv.addEventListener('touchmove',onMove,{passive:false});
+  cv.addEventListener('touchend',onUp);
+  window.addEventListener('resize',resize);
+
   window._spiralStart=()=>{cancelAnimationFrame(raf);draw();};
   window._spiralStop=()=>{cancelAnimationFrame(raf);raf=null;};
   document.addEventListener('visibilitychange',()=>{
@@ -1692,7 +1984,64 @@ function initDrag(container){
   window.addEventListener('mousemove',e=>{if(live)moveDrag(e.clientY);});
   window.addEventListener('mouseup',()=>{clearTimeout(holdTimer);if(live)endDrag();});
 }
-load();updateGreeting();updateXPBar();updateRing();renderDashboard();renderHabitFilters();renderTaskFilters();snapshotHistory();updateFab();
+/* ── BOOT ── */
+(()=>{
+  // load data and prepare app (hidden behind intro)
+  load();updateGreeting();updateXPBar();updateRing();
+  renderDashboard();renderHabitFilters();renderTaskFilters();snapshotHistory();
+
+  const scr=document.getElementById('intro-screen');
+  const greetEl=document.getElementById('intro-greeting');
+  const nameEl=document.getElementById('intro-name');
+  const logoEl=document.getElementById('intro-logo');
+  const appEl=document.getElementById('app');
+
+  const h=new Date().getHours();
+  const word=h<12?'bom dia':h<18?'boa tarde':'boa noite';
+  const fullGreet='olá, '+word;
+  const userName=(S.userName||'').trim();
+
+  // step 1: fade in greeting text area
+  setTimeout(()=>{
+    greetEl.classList.add('show');
+    let i=0;
+    const cursor=document.createElement('span');
+    cursor.className='cursor';
+    greetEl.appendChild(cursor);
+
+    function type(){
+      if(i<=fullGreet.length){
+        greetEl.firstChild?greetEl.firstChild.nodeValue=fullGreet.slice(0,i):(greetEl.insertBefore(document.createTextNode(fullGreet.slice(0,i)),cursor));
+        // rebuild: clear and reset
+        greetEl.textContent='';
+        greetEl.appendChild(document.createTextNode(fullGreet.slice(0,i)));
+        greetEl.appendChild(cursor);
+        i++;
+        setTimeout(type, i===1?160: 36+Math.random()*24);
+      } else {
+        // remove cursor
+        setTimeout(()=>cursor.remove(), 300);
+        // step 2: show name if exists
+        if(userName){
+          nameEl.textContent=userName;
+          setTimeout(()=>nameEl.classList.add('show'), 180);
+        }
+        // step 3: logo
+        setTimeout(()=>logoEl.classList.add('show'), userName?350:150);
+        // step 4: fade out intro, reveal app
+        const hold=userName?1100:900;
+        setTimeout(()=>{
+          scr.classList.add('out');
+          appEl.classList.add('app-visible');
+          const fabW=document.getElementById('fab-wrap');
+          if(fabW){fabW.style.display='';updateFab();}
+          setTimeout(()=>scr.classList.add('gone'), 580);
+        }, hold);
+      }
+    }
+    type();
+  }, 200);
+})();
 </script>
 </body>
 </html>
