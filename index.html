@@ -514,7 +514,108 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .xp-pop{position:fixed;z-index:998;font-family:var(--mono);font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);pointer-events:none;animation:floatUp 1.1s ease-out forwards;}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-48px)}}
 
-/* ── INTRO ── */
+/* ── LOGIN SCREEN ── */
+#login-screen{
+  position:fixed;inset:0;z-index:8000;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(24px,6vw,48px);
+  transition:opacity 0.5s ease;
+}
+#login-screen.out{opacity:0;pointer-events:none;}
+#login-screen.gone{display:none;}
+.login-inner{
+  width:100%;max-width:320px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;
+}
+.login-logo{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0.38em;
+  color:var(--t4);
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.login-title{
+  font-size:clamp(28px,7vw,36px);
+  font-weight:300;
+  color:var(--t1);
+  letter-spacing:-0.02em;
+  margin-bottom:6px;
+}
+.login-sub{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0.12em;
+  color:var(--t3);
+  margin-bottom:48px;
+  text-align:center;
+  line-height:1.6;
+}
+.login-btn{
+  width:100%;
+  padding:15px 20px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.04);
+  color:var(--t1);
+  font-family:var(--sans);
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  transition:background 0.15s, border-color 0.15s, transform 0.12s;
+  margin-bottom:10px;
+  position:relative;
+  overflow:hidden;
+}
+.login-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.login-btn:active{transform:scale(0.98);background:rgba(255,255,255,0.08);}
+.login-btn:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.2);}
+.login-btn-google{border-color:rgba(255,255,255,0.15);}
+.login-btn-guest{
+  background:none;
+  border-color:rgba(255,255,255,0.06);
+  color:var(--t3);
+  font-size:12px;
+  padding:12px;
+  margin-top:6px;
+}
+.login-btn-guest:hover{color:var(--t2);border-color:rgba(255,255,255,0.12);}
+.login-divider{
+  width:100%;
+  display:flex;align-items:center;gap:12px;
+  margin:4px 0;
+}
+.login-divider::before,.login-divider::after{
+  content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);
+}
+.login-divider span{
+  font-family:var(--mono);font-size:8px;
+  letter-spacing:0.12em;color:var(--t4);
+  text-transform:uppercase;
+}
+.login-error{
+  font-family:var(--mono);font-size:9px;
+  letter-spacing:0.1em;color:rgba(255,100,90,0.8);
+  text-align:center;margin-top:12px;
+  min-height:16px;
+}
+.login-loading{
+  font-family:var(--mono);font-size:9px;
+  letter-spacing:0.15em;color:var(--t4);
+  text-transform:uppercase;
+  animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+/* google icon svg inline */
+.g-icon{width:18px;height:18px;flex-shrink:0;}
+</style>
 #app{opacity:0;}
 #app.app-visible{opacity:1;transition:opacity 0.5s ease;}
 
@@ -576,6 +677,33 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </style>
 </head>
 <body>
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-inner">
+    <div class="login-logo">aurea</div>
+    <div class="login-title">Bem-vindo</div>
+    <div class="login-sub">seu assistente pessoal<br>inteligente</div>
+
+    <button class="login-btn login-btn-google" id="btn-google">
+      <svg class="g-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Entrar com Google
+    </button>
+
+    <div class="login-divider"><span>ou</span></div>
+
+    <button class="login-btn login-btn-guest" id="btn-guest">
+      Continuar como convidado
+    </button>
+
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
 <!-- INTRO -->
 <div id="intro-screen">
   <div id="intro-inner">
@@ -770,10 +898,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div class="drawer-avatar" id="d-avatar">👤</div>
       <div class="drawer-profile-info">
         <div class="drawer-profile-name" id="d-profile-name">Perfil</div>
-        <div class="drawer-profile-sub">toque para editar</div>
+        <div class="drawer-profile-sub" id="d-profile-sub">toque para editar</div>
       </div>
     </div>
     <input class="drawer-name-input" id="d-name-input" placeholder="seu nome…" maxlength="32" style="display:none" oninput="updateUserName(this.value)" onblur="hidNameInput()">
+    <button id="btn-logout" style="width:100%;background:none;border:none;border-top:1px solid var(--sep);padding:12px 0 0;font-family:var(--mono);font-size:8px;letter-spacing:0.15em;color:rgba(255,255,255,0.2);text-transform:uppercase;cursor:pointer;text-align:left;transition:color 0.15s;" onmouseover="this.style.color='rgba(255,100,90,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">sair da conta</button>
   </div>
 </div>
 
@@ -791,7 +920,21 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 <div id="toast">✓</div>
 
-<script>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getAuth,GoogleAuthProvider,signInWithPopup,signInAnonymously,signOut,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,setDoc}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const _fbApp=initializeApp({
+  apiKey:"AIzaSyBkqTwAQBQ83WGPd5U6ho4kvxI_Ubv0YXQ",
+  authDomain:"aura-app-a6b0d.firebaseapp.com",
+  projectId:"aura-app-a6b0d",
+  storageBucket:"aura-app-a6b0d.firebasestorage.app",
+  messagingSenderId:"360925170597",
+  appId:"1:360925170597:web:84b6f1dbf873360214364c"
+});
+const auth=getAuth(_fbApp);
+const db=getFirestore(_fbApp);
 const DAYS=['D','S','T','Q','Q','S','S'];
 const DAY_FULL=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const XP_LVL=200,XP_H=25,XP_T=15,XP_F=10;
@@ -806,7 +949,7 @@ let S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',
 let mDays=[0,1,2,3,4,5,6],mType='',mEditId=null,mColor=TAG_COLORS[0],mRepeat='daily',curTab='dashboard',curPd='week';
 let habitFilter='all',taskFilter='all';
 
-function save(){try{localStorage.setItem('aurea_v5',JSON.stringify(S));}catch(e){}}
+function saveLocal(){try{localStorage.setItem('aurea_v5',JSON.stringify(S));}catch(e){}}
 function load(){
   try{const d=localStorage.getItem('aurea_v5');if(d)S=JSON.parse(d);}catch(e){}
   if(!Array.isArray(S.history))S.history=[];
@@ -825,6 +968,17 @@ function updateGreeting(){
   // drawer profile
   document.getElementById('d-profile-name').textContent=S.userName||'Perfil';
   document.getElementById('d-avatar').textContent=S.userName?S.userName[0].toUpperCase():'👤';
+  // show email or guest status
+  const sub=document.getElementById('d-profile-sub');
+  if(sub){
+    if(currentUser&&!currentUser.isAnonymous&&currentUser.email){
+      sub.textContent=currentUser.email;
+    } else if(currentUser&&currentUser.isAnonymous){
+      sub.textContent='convidado · dados locais';
+    } else {
+      sub.textContent='toque para editar';
+    }
+  }
 }
 function updateUserName(val){
   S.userName=val.trim();save();updateGreeting();
@@ -1984,10 +2138,107 @@ function initDrag(container){
   window.addEventListener('mousemove',e=>{if(live)moveDrag(e.clientY);});
   window.addEventListener('mouseup',()=>{clearTimeout(holdTimer);if(live)endDrag();});
 }
-/* ── BOOT ── */
-(()=>{
-  // load data and prepare app (hidden behind intro)
-  load();updateGreeting();updateXPBar();updateRing();
+/* ── LOGOUT ── */
+async function doLogout(){
+  closeDrawer();
+  S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''};
+  currentUser=null;
+  const appEl=document.getElementById('app');
+  if(appEl){appEl.style.opacity='0';appEl.classList.remove('app-visible');}
+  const is=document.getElementById('intro-screen');
+  if(is)is.classList.add('gone');
+  const greetEl=document.getElementById('intro-greeting');
+  const nameEl=document.getElementById('intro-name');
+  const logoEl=document.getElementById('intro-logo');
+  if(greetEl){greetEl.textContent='';greetEl.classList.remove('show');}
+  if(nameEl){nameEl.textContent='';nameEl.classList.remove('show');}
+  if(logoEl)logoEl.classList.remove('show');
+  await signOut(auth);
+}
+window.doLogout=doLogout;
+
+let currentUser=null;
+
+/* ── FIRESTORE SYNC ── */
+async function fsLoad(uid){
+  try{
+    const snap=await getDoc(doc(db,'users',uid));
+    if(snap.exists()){
+      S=Object.assign({habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''},snap.data());
+    }
+  }catch(e){console.warn('fsLoad',e);}
+}
+async function fsSave(){
+  if(!currentUser||currentUser.isAnonymous)return;
+  try{await setDoc(doc(db,'users',currentUser.uid),S);}
+  catch(e){console.warn('fsSave',e);}
+}
+function save(){saveLocal();if(currentUser&&!currentUser.isAnonymous)fsSave();}
+
+/* ── AUTH ACTIONS ── */
+function setLoginError(msg){const el=document.getElementById('login-error');if(el)el.textContent=msg;}
+function setLoginLoading(on){
+  const bg=document.getElementById('btn-google');
+  const gu=document.getElementById('btn-guest');
+  if(bg)bg.disabled=on;
+  if(gu)gu.disabled=on;
+  if(on&&bg)bg.innerHTML='<span class="login-loading">conectando…</span>';
+  else if(bg)bg.innerHTML=`<svg class="g-icon" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Entrar com Google`;
+}
+async function loginGoogle(){
+  setLoginError('');setLoginLoading(true);
+  try{
+    await signInWithPopup(auth,new GoogleAuthProvider());
+  }catch(e){
+    setLoginLoading(false);
+    if(e.code!=='auth/popup-closed-by-user')setLoginError('Erro ao entrar com Google. Tente novamente.');
+  }
+}
+async function loginGuest(){
+  setLoginError('');
+  const gu=document.getElementById('btn-guest');
+  if(gu){gu.disabled=true;gu.textContent='entrando…';}
+  try{await signInAnonymously(auth);}
+  catch(e){
+    if(gu){gu.disabled=false;gu.textContent='Continuar como convidado';}
+    setLoginError('Erro ao entrar. Tente novamente.');
+  }
+}
+// wire up login buttons via addEventListener (type=module scope safe)
+document.getElementById('btn-google')?.addEventListener('click',loginGoogle);
+document.getElementById('btn-guest')?.addEventListener('click',loginGuest);
+document.getElementById('btn-logout')?.addEventListener('click',doLogout);
+
+function hideLoginScreen(){
+  const ls=document.getElementById('login-screen');
+  if(ls){ls.classList.add('out');setTimeout(()=>ls.classList.add('gone'),520);}
+}
+
+/* ── AUTH STATE ── */
+onAuthStateChanged(auth,async(user)=>{
+  if(!user){
+    const ls=document.getElementById('login-screen');
+    const is=document.getElementById('intro-screen');
+    const ap=document.getElementById('app');
+    if(ls){ls.classList.remove('out','gone');}
+    if(is)is.classList.add('gone');
+    if(ap)ap.style.opacity='0';
+    return;
+  }
+  currentUser=user;
+  if(!user.isAnonymous){
+    await fsLoad(user.uid);
+    if(!S.userName&&user.displayName){S.userName=user.displayName.split(' ')[0];fsSave();}
+  }else{
+    load();
+  }
+  hideLoginScreen();
+  bootApp();
+});
+
+/* ── BOOT APP (after auth) ── */
+function bootApp(){
+  updateGreeting();updateXPBar();updateRing();
   renderDashboard();renderHabitFilters();renderTaskFilters();snapshotHistory();
 
   const scr=document.getElementById('intro-screen');
@@ -2001,7 +2252,8 @@ function initDrag(container){
   const fullGreet='olá, '+word;
   const userName=(S.userName||'').trim();
 
-  // step 1: fade in greeting text area
+  scr.classList.remove('gone','out');
+
   setTimeout(()=>{
     greetEl.classList.add('show');
     let i=0;
@@ -2011,37 +2263,41 @@ function initDrag(container){
 
     function type(){
       if(i<=fullGreet.length){
-        greetEl.firstChild?greetEl.firstChild.nodeValue=fullGreet.slice(0,i):(greetEl.insertBefore(document.createTextNode(fullGreet.slice(0,i)),cursor));
-        // rebuild: clear and reset
         greetEl.textContent='';
         greetEl.appendChild(document.createTextNode(fullGreet.slice(0,i)));
         greetEl.appendChild(cursor);
         i++;
-        setTimeout(type, i===1?160: 36+Math.random()*24);
-      } else {
-        // remove cursor
-        setTimeout(()=>cursor.remove(), 300);
-        // step 2: show name if exists
+        setTimeout(type,i===1?160:36+Math.random()*24);
+      }else{
+        setTimeout(()=>cursor.remove(),300);
         if(userName){
           nameEl.textContent=userName;
-          setTimeout(()=>nameEl.classList.add('show'), 180);
+          setTimeout(()=>nameEl.classList.add('show'),180);
         }
-        // step 3: logo
-        setTimeout(()=>logoEl.classList.add('show'), userName?350:150);
-        // step 4: fade out intro, reveal app
+        setTimeout(()=>logoEl.classList.add('show'),userName?350:150);
         const hold=userName?1100:900;
         setTimeout(()=>{
           scr.classList.add('out');
           appEl.classList.add('app-visible');
           const fabW=document.getElementById('fab-wrap');
           if(fabW){fabW.style.display='';updateFab();}
-          setTimeout(()=>scr.classList.add('gone'), 580);
-        }, hold);
+          setTimeout(()=>scr.classList.add('gone'),580);
+        },hold);
       }
     }
     type();
-  }, 200);
-})();
+  },200);
+}
+
+/* ── EXPOSE GLOBALS (required for type=module) ── */
+Object.assign(window,{
+  toggleDrawer,closeDrawer,setTab,openModal,closeModal,overlayClose,
+  onFabClick,fabAction,updateFab,
+  saveHabit,saveTask,saveFinance,deleteItem,deleteTransaction,
+  selectPill,setPeriod,
+  updateUserName,hidNameInput,
+  renderHabitFilters,renderTaskFilters,
+});
 </script>
 </body>
 </html>
