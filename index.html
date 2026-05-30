@@ -709,7 +709,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 
 <!-- INTRO -->
-<div id="intro-screen">
+<div id="intro-screen" class="gone">
   <div id="intro-inner">
     <div id="intro-greeting"></div>
     <div id="intro-name"></div>
@@ -2234,15 +2234,11 @@ onAuthStateChanged(auth,async(user)=>{
   authResolved=true;
   if(!user){
     const ls=document.getElementById('login-screen');
-    if(ls){ls.style.display='flex';ls.classList.add('visible');}
-  }
-  if(!user){
-    const ls=document.getElementById('login-screen');
     const is=document.getElementById('intro-screen');
     const ap=document.getElementById('app');
-    if(ls){ls.classList.remove('out','gone');}
     if(is)is.classList.add('gone');
     if(ap)ap.style.opacity='0';
+    if(ls){ls.classList.remove('out','gone');ls.style.display='flex';setTimeout(()=>ls.classList.add('visible'),50);}
     return;
   }
   currentUser=user;
