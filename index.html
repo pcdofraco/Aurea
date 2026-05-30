@@ -925,20 +925,36 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="toast">✓</div>
 
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getAuth,GoogleAuthProvider,signInWithPopup,signInAnonymously,signOut,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import{getFirestore,doc,getDoc,setDoc}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+/* ─────────────────────────────────────────
+   DEV_MODE — mude para false antes de subir
+   ───────────────────────────────────────── */
+const DEV_MODE = false;
+/* ───────────────────────────────────────── */
 
-const _fbApp=initializeApp({
-  apiKey:"AIzaSyBkqTwAQBQ83WGPd5U6ho4kvxI_Ubv0YXQ",
-  authDomain:"aura-app-a6b0d.firebaseapp.com",
-  projectId:"aura-app-a6b0d",
-  storageBucket:"aura-app-a6b0d.firebasestorage.app",
-  messagingSenderId:"360925170597",
-  appId:"1:360925170597:web:84b6f1dbf873360214364c"
-});
-const auth=getAuth(_fbApp);
-const db=getFirestore(_fbApp);
+// Firebase só carrega em produção
+let auth=null,db=null,GoogleAuthProvider=null,signInWithPopup=null,
+    signInAnonymously=null,signOut=null,onAuthStateChanged=null,
+    fsDoc=null,getDoc=null,setDoc=null;
+
+if(!DEV_MODE){
+  const[{initializeApp},{getAuth,GoogleAuthProvider:GAP,signInWithPopup:SWP,signInAnonymously:SIA,signOut:SO,onAuthStateChanged:OAC},{getFirestore,doc:D,getDoc:GD,setDoc:SD}]=await Promise.all([
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'),
+  ]);
+  const _app=initializeApp({
+    apiKey:"AIzaSyBkqTwAQBQ83WGPd5U6ho4kvxI_Ubv0YXQ",
+    authDomain:"aura-app-a6b0d.firebaseapp.com",
+    projectId:"aura-app-a6b0d",
+    storageBucket:"aura-app-a6b0d.firebasestorage.app",
+    messagingSenderId:"360925170597",
+    appId:"1:360925170597:web:84b6f1dbf873360214364c"
+  });
+  auth=getAuth(_app);db=getFirestore(_app);
+  GoogleAuthProvider=GAP;signInWithPopup=SWP;signInAnonymously=SIA;
+  signOut=SO;onAuthStateChanged=OAC;
+  fsDoc=D;getDoc=GD;setDoc=SD;
+}
 const DAYS=['D','S','T','Q','Q','S','S'];
 const DAY_FULL=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const XP_LVL=200,XP_H=25,XP_T=15,XP_F=10;
@@ -2168,7 +2184,7 @@ let currentUser=null;
 /* ── FIRESTORE SYNC ── */
 async function fsLoad(uid){
   try{
-    const snap=await getDoc(doc(db,'users',uid));
+    const snap=await getDoc(fsDoc(db,'users',uid));
     if(snap.exists()){
       S=Object.assign({habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''},snap.data());
     }
@@ -2176,7 +2192,7 @@ async function fsLoad(uid){
 }
 async function fsSave(){
   if(!currentUser||currentUser.isAnonymous)return;
-  try{await setDoc(doc(db,'users',currentUser.uid),S);}
+  try{await setDoc(fsDoc(db,'users',currentUser.uid),S);}
   catch(e){console.warn('fsSave',e);}
 }
 function save(){saveLocal();if(currentUser&&!currentUser.isAnonymous)fsSave();}
@@ -2223,34 +2239,43 @@ function hideLoginScreen(){
 /* ── AUTH STATE ── */
 // fallback: se Firebase não responder em 6s, mostra login
 let authResolved=false;
-setTimeout(()=>{
-  if(!authResolved){
-    const ls=document.getElementById('login-screen');
-    if(ls){ls.classList.remove('out','gone');ls.classList.add('visible');}
-  }
-},6000);
 
-onAuthStateChanged(auth,async(user)=>{
+if(DEV_MODE){
   authResolved=true;
-  if(!user){
-    const ls=document.getElementById('login-screen');
-    const is=document.getElementById('intro-screen');
-    const ap=document.getElementById('app');
-    if(is)is.classList.add('gone');
-    if(ap)ap.style.opacity='0';
-    if(ls){ls.classList.remove('out','gone');ls.style.display='flex';setTimeout(()=>ls.classList.add('visible'),50);}
-    return;
-  }
-  currentUser=user;
-  if(!user.isAnonymous){
-    await fsLoad(user.uid);
-    if(!S.userName&&user.displayName){S.userName=user.displayName.split(' ')[0];fsSave();}
-  }else{
-    load();
-  }
-  hideLoginScreen();
+  currentUser=null;
+  load();
+  document.getElementById('login-screen')?.classList.add('gone');
   bootApp();
-});
+}else{
+  setTimeout(()=>{
+    if(!authResolved){
+      const ls=document.getElementById('login-screen');
+      if(ls){ls.classList.remove('out','gone');ls.classList.add('visible');}
+    }
+  },6000);
+
+  onAuthStateChanged(auth,async(user)=>{
+    authResolved=true;
+    if(!user){
+      const ls=document.getElementById('login-screen');
+      const is=document.getElementById('intro-screen');
+      const ap=document.getElementById('app');
+      if(is)is.classList.add('gone');
+      if(ap)ap.style.opacity='0';
+      if(ls){ls.classList.remove('out','gone');ls.style.display='flex';setTimeout(()=>ls.classList.add('visible'),50);}
+      return;
+    }
+    currentUser=user;
+    if(!user.isAnonymous){
+      await fsLoad(user.uid);
+      if(!S.userName&&user.displayName){S.userName=user.displayName.split(' ')[0];fsSave();}
+    }else{
+      load();
+    }
+    hideLoginScreen();
+    bootApp();
+  });
+}
 
 /* ── BOOT APP (after auth) ── */
 function bootApp(){
