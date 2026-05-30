@@ -236,6 +236,55 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .delta-neg{color:rgba(255,100,80,0.8);}
 .val-in{color:rgba(255,255,255,0.85);}
 .val-out{color:rgba(255,255,255,0.5);}
+/* ── FINANCE ACTIONS ── */
+.fin-actions{display:flex;gap:10px;margin-bottom:24px;}
+.fin-pill-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 20px;border-radius:100px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.7);
+  font-family:var(--mono);font-size:10px;letter-spacing:0.14em;
+  text-transform:uppercase;cursor:pointer;
+  transition:background 0.15s,border-color 0.15s,transform 0.1s,color 0.15s;
+}
+.fin-pill-btn:active{transform:scale(0.96);}
+.fin-pill-btn:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.9);}
+.fin-pill-out{background:none;border-color:rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);}
+.fin-pill-out:hover{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.6);}
+
+/* ── PATRIMÔNIO CARDS ── */
+.fin-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.fin-pcard{
+  padding:14px 16px;border-radius:14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+}
+.fin-pcard-total{
+  grid-column:1/-1;
+  background:rgba(255,255,255,0.04);
+  border-color:rgba(255,255,255,0.09);
+}
+.fin-pcard-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.16em;color:var(--t4);text-transform:uppercase;margin-bottom:7px;}
+.fin-pcard-val{font-size:clamp(16px,4vw,20px);font-weight:300;color:var(--t1);letter-spacing:-0.02em;}
+.fin-pcard-total .fin-pcard-val{font-size:clamp(22px,5.5vw,30px);}
+.fin-pcard-editable{cursor:text;}
+.fin-pcard-input{
+  background:none;border:none;outline:none;
+  font-size:clamp(16px,4vw,20px);font-weight:300;
+  color:var(--t1);letter-spacing:-0.02em;
+  width:100%;padding:0;margin:0;
+  font-family:var(--sans);
+}
+.fin-pcard-input::placeholder{color:var(--t4);}
+/* invest toggle no modal */
+.fin-invest-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--sep);margin-top:4px;cursor:pointer;}
+.fin-invest-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--t3);text-transform:uppercase;}
+.fin-invest-switch{width:32px;height:18px;border-radius:9px;background:rgba(255,255,255,0.1);position:relative;transition:background 0.2s;}
+.fin-invest-switch.on{background:rgba(255,255,255,0.35);}
+.fin-invest-switch::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.6);transition:transform 0.2s;}
+.fin-invest-switch.on::after{transform:translateX(14px);background:#fff;}
+
 /* disponivel / poupança */
 .fin-row{display:flex;justify-content:space-between;padding:clamp(11px,2.2vw,14px) 0;border-bottom:1px solid var(--sep);}
 .fin-row-lbl{font-family:var(--mono);font-size:clamp(9px,2vw,10px);letter-spacing:0.1em;color:var(--t3);text-transform:uppercase;}
@@ -246,6 +295,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .avail-row{display:flex;justify-content:space-between;align-items:center;padding:clamp(11px,2.2vw,14px) 0;border-bottom:1px solid var(--sep);}
 .avail-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:clamp(13px,2.8vw,15px);font-weight:700;color:rgba(255,255,255,0.62);text-align:right;width:120px;}
 .avail-input::placeholder{color:var(--t4);}
+/* recorrência no modal */
+.m-recur-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.m-recur-pill{
+  padding:5px 12px;border-radius:20px;font-family:var(--mono);font-size:9px;
+  letter-spacing:0.12em;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1);
+  background:none;color:var(--t3);cursor:pointer;transition:all 0.15s;
+}
+.m-recur-pill.sel{background:rgba(255,255,255,0.12);color:var(--t1);border-color:rgba(255,255,255,0.25);}
+/* invest tag */
+.trans-invest-badge{font-family:var(--mono);font-size:7px;letter-spacing:0.1em;color:rgba(180,160,255,0.7);background:rgba(180,160,255,0.08);border-radius:4px;padding:1px 5px;margin-left:4px;text-transform:uppercase;}
 /* categories */
 .cat-section{margin:clamp(14px,3vw,20px) 0 0;}
 .cat-section-hdr{display:flex;align-items:center;gap:8px;margin-bottom:clamp(12px,2.5vw,16px);}
@@ -780,49 +839,58 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <div id="sec-financas" class="section">
-      <!-- BOTÕES ENTRADA/SAÍDA no topo -->
-      <div class="fin-btns-top">
-        <button class="fin-btn btn-3d" onclick="openModal('fin-in',null)">↑ Entrada</button>
-        <button class="fin-btn btn-3d" onclick="openModal('fin-out',null)">↓ Saída</button>
+
+      <!-- BOTÕES PILL -->
+      <div class="fin-actions">
+        <button class="fin-pill-btn" onclick="openModal('fin-in',null)">
+          <svg width="10" height="10" viewBox="0 0 10 10"><line x1="5" y1="1" x2="5" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="5" x2="9" y2="5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          entrada
+        </button>
+        <button class="fin-pill-btn fin-pill-out" onclick="openModal('fin-out',null)">
+          <svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="5" x2="9" y2="5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          saída
+        </button>
       </div>
-      <!-- HERO SALDO -->
-      <div class="fin-hero-card">
-        <div class="fin-hero-lbl">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="3" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 3V2.5A1.5 1.5 0 0 1 4.5 1h3A1.5 1.5 0 0 1 9 2.5V3" stroke="currentColor" stroke-width="1.2"/></svg>
-          Saldo total
+
+      <!-- CARDS -->
+      <div class="fin-cards-grid">
+        <div class="fin-pcard fin-pcard-total">
+          <div class="fin-pcard-lbl">total</div>
+          <div class="fin-pcard-val" id="fp-total">R$ 0</div>
         </div>
-        <div class="fin-hero-val" id="fin-total-display"><span style="font-size:0.38em;font-weight:400;color:var(--t3);vertical-align:super;margin-right:2px;letter-spacing:0">R$</span>0<span class="fin-dec" style="font-size:0.38em;color:var(--t3);font-weight:300">,00</span></div>
-        <div class="bank-tags" id="bank-tags-list"></div>
+        <div class="fin-pcard fin-pcard-editable" onclick="document.getElementById('fp-avail-input').focus()">
+          <div class="fin-pcard-lbl">disponível</div>
+          <input class="fin-pcard-input" id="fp-avail-input" type="number" placeholder="0" min="0" step="0.01" oninput="updateAvail()">
+        </div>
+        <div class="fin-pcard">
+          <div class="fin-pcard-lbl">guardado</div>
+          <div class="fin-pcard-val" id="fp-save">R$ 0</div>
+        </div>
       </div>
-      <!-- RECEITA / DESPESAS -->
+
+      <!-- RECEITA / DESPESA -->
       <div class="fin-split">
         <div class="fin-split-card">
-          <div class="fin-split-lbl">↑ Receita</div>
+          <div class="fin-split-lbl">↑ receita</div>
           <div class="fin-split-val val-in" id="fin-in">R$ 0</div>
-          <div class="fin-split-delta delta-pos" id="fin-in-delta"></div>
         </div>
         <div class="fin-split-card">
-          <div class="fin-split-lbl">↓ Despesas</div>
+          <div class="fin-split-lbl">↓ despesas</div>
           <div class="fin-split-val val-out" id="fin-out">R$ 0</div>
-          <div class="fin-split-delta delta-neg" id="fin-out-delta"></div>
         </div>
       </div>
-      <!-- DISPONIVEL / POUPANÇA -->
-      <div class="avail-row">
-        <span class="fin-row-lbl">Disponível p/ gastar</span>
-        <input class="avail-input" id="avail-input" type="number" placeholder="0,00" oninput="updateSaving()">
-      </div>
-      <div class="fin-row"><span class="fin-row-lbl">Poupança guardada</span><span class="fin-row-val val-save" id="saving-val">R$ 0,00</span></div>
+
       <!-- POR CATEGORIA -->
       <div class="cat-section">
         <div class="cat-section-hdr">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="opacity:.4"><rect x="1" y="7" width="2" height="4" rx="1" fill="currentColor"/><rect x="5" y="4" width="2" height="7" rx="1" fill="currentColor"/><rect x="9" y="1" width="2" height="10" rx="1" fill="currentColor"/></svg>
-          <span class="cat-section-lbl">Por categoria</span>
+          <span class="cat-section-lbl">por categoria</span>
         </div>
         <div id="cat-list"></div>
       </div>
+
       <!-- TRANSAÇÕES -->
-      <div class="trans-lbl">Transações</div>
+      <div class="trans-lbl">transações</div>
       <div id="trans-list"></div>
     </div>
 
@@ -936,7 +1004,8 @@ let auth=null,db=null,GoogleAuthProvider=null,signInWithPopup=null,
     signInAnonymously=null,signOut=null,onAuthStateChanged=null,
     fsDoc=null,getDoc=null,setDoc=null;
 
-if(!DEV_MODE){
+async function initFirebase(){
+  if(DEV_MODE) return;
   const[{initializeApp},{getAuth,GoogleAuthProvider:GAP,signInWithPopup:SWP,signInAnonymously:SIA,signOut:SO,onAuthStateChanged:OAC},{getFirestore,doc:D,getDoc:GD,setDoc:SD}]=await Promise.all([
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
@@ -955,6 +1024,7 @@ if(!DEV_MODE){
   signOut=SO;onAuthStateChanged=OAC;
   fsDoc=D;getDoc=GD;setDoc=SD;
 }
+await initFirebase();
 const DAYS=['D','S','T','Q','Q','S','S'];
 const DAY_FULL=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const XP_LVL=200,XP_H=25,XP_T=15,XP_F=10;
@@ -965,7 +1035,7 @@ const REPEAT_TYPES=[
   {id:'custom',  label:'Dias custom'},
   {id:'once',    label:'Uma vez'},
 ];
-let S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''};
+let S={habits:[],tasks:[],transactions:[],investments:[],xp:0,streak:0,available:0,savings:0,lastDate:'',history:[],userName:''};
 let mDays=[0,1,2,3,4,5,6],mType='',mEditId=null,mColor=TAG_COLORS[0],mRepeat='daily',curTab='dashboard',curPd='week';
 let habitFilter='all',taskFilter='all';
 
@@ -1336,38 +1406,19 @@ function animateCount(el,target,prefix,suffix,duration){
 function renderFinance(animate){
   const ins=S.transactions.filter(t=>t.type==='in').reduce((a,t)=>a+t.amount,0);
   const outs=S.transactions.filter(t=>t.type==='out').reduce((a,t)=>a+t.amount,0);
-  const total=ins-outs,avail=S.available||0,saving=Math.max(0,total-avail);
+  const saldo=ins-outs;
+  const disponivel=S.available||0;
+  const guardado=Math.max(0,saldo-disponivel);
 
-  // hero
-  const absTotal=Math.abs(total);
-  const heroEl=document.getElementById('fin-total-display');
-  if(animate){
-    animateCount(heroEl,absTotal,`<span style="font-size:0.38em;font-weight:400;color:var(--t3);vertical-align:super;margin-right:2px;letter-spacing:0">R$</span>${total<0?'-':''}`,``,700);
-  }else{
-    const totalFormatted=fmt(absTotal);
-    const [tip,tdp]=totalFormatted.split(',');
-    heroEl.innerHTML=`<span style="font-size:0.38em;font-weight:400;color:var(--t3);vertical-align:super;margin-right:2px;letter-spacing:0">R$</span>${total<0?'-':''}${tip}<span style="font-size:0.38em;color:var(--t3);font-weight:300">,${tdp||'00'}</span>`;
-  }
+  const setCard=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent='R$ '+fmt(val);};
+  setCard('fp-total',saldo);
+  setCard('fp-save',guardado);
+  const inp=document.getElementById('fp-avail-input');
+  if(inp&&!inp.matches(':focus'))inp.value=disponivel||'';
 
-  // bank tags
-  const bankTags=document.getElementById('bank-tags-list');
-  bankTags.innerHTML='';
-  const bankTotals={};
-  S.transactions.forEach(t=>{
-    const b=t.bank||'outro';
-    if(!bankTotals[b])bankTotals[b]=0;
-    bankTotals[b]+=(t.type==='in'?t.amount:-t.amount);
-  });
-  Object.entries(bankTotals).forEach(([bid,val])=>{
-    const bank=BANKS.find(b=>b.id===bid)||BANKS[BANKS.length-1];
-    const tag=document.createElement('div');tag.className='bank-tag';
-    tag.innerHTML=`<div class="bank-dot" style="background:${bank.color}"></div><span class="bank-tag-name">${bank.name}</span><span class="bank-tag-val">R$ ${Math.round(Math.abs(val)).toLocaleString('pt-BR')}</span>`;
-    bankTags.appendChild(tag);
-  });
-
-  // receita/despesas
+  // receita/despesa
   const inEl=document.getElementById('fin-in'),outEl=document.getElementById('fin-out');
-  if(animate){
+  if(animate&&inEl&&outEl){
     inEl.classList.add('animating');outEl.classList.add('animating');
     let p=0;const dur=600,t0=Date.now();
     const tick=()=>{p=Math.min(1,(Date.now()-t0)/dur);const e=1-Math.pow(1-p,3);
@@ -1375,18 +1426,9 @@ function renderFinance(animate){
       if(p<1)requestAnimationFrame(tick);
       else{inEl.textContent=fmtShort(ins);outEl.textContent=fmtShort(outs);inEl.classList.remove('animating');outEl.classList.remove('animating');}
     };requestAnimationFrame(tick);
-  }else{
+  }else if(inEl&&outEl){
     inEl.textContent=fmtShort(ins);outEl.textContent=fmtShort(outs);
   }
-  // delta vs last month placeholder
-  const prevIns=ins*0.88,prevOuts=outs*1.08;
-  const dIn=ins&&prevIns?Math.round(((ins-prevIns)/prevIns)*100):null;
-  const dOut=outs&&prevOuts?Math.round(((outs-prevOuts)/prevOuts)*100):null;
-  document.getElementById('fin-in-delta').textContent=dIn!==null?(dIn>=0?'+':'')+dIn+'%':'';
-  document.getElementById('fin-out-delta').textContent=dOut!==null?(dOut>=0?'+':'')+dOut+'%':'';
-
-  document.getElementById('avail-input').value=avail||'';
-  document.getElementById('saving-val').textContent='R$ '+fmt(saving);
 
   // categories
   const catTotals={};
@@ -1396,55 +1438,68 @@ function renderFinance(animate){
     catTotals[c]+=t.amount;
   });
   const catList=document.getElementById('cat-list');
-  catList.innerHTML='';
-  if(outs>0){
-    const sorted=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
-    sorted.forEach(([cid,val])=>{
-      const cat=CATS.find(c=>c.id===cid)||CATS[CATS.length-1];
-      const pct=Math.round((val/outs)*100);
-      const row=document.createElement('div');row.className='cat-row';
-      row.innerHTML=`
-        <div class="cat-dot" style="background:${cat.color}"></div>
-        <div class="cat-name">${cat.name}</div>
-        <div class="cat-bar-wrap"><div class="cat-bar" style="width:${pct}%;background:${cat.color}"></div></div>
-        <div class="cat-pct">${pct}%</div>`;
-      catList.appendChild(row);
-    });
-  }else{
-    catList.innerHTML='<div class="empty" style="padding:16px 0">Sem despesas ainda</div>';
+  if(catList){
+    catList.innerHTML='';
+    if(outs>0){
+      Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).forEach(([cid,val])=>{
+        const cat=CATS.find(c=>c.id===cid)||CATS[CATS.length-1];
+        const pct=Math.round((val/outs)*100);
+        const row=document.createElement('div');row.className='cat-row';
+        row.innerHTML=`<div class="cat-dot" style="background:${cat.color}"></div><div class="cat-name">${cat.name}</div><div class="cat-bar-wrap"><div class="cat-bar" style="width:${pct}%;background:${cat.color}"></div></div><div class="cat-pct">${pct}%</div>`;
+        catList.appendChild(row);
+      });
+    }else{
+      catList.innerHTML='<div class="empty" style="padding:16px 0">Sem despesas ainda</div>';
+    }
   }
 
-  // transactions list
+  // transactions list (inclui investimentos)
   const tl=document.getElementById('trans-list');
-  if(!S.transactions.length){tl.innerHTML='<div class="empty">Nenhuma transação</div>';return;}
+  if(!tl)return;
+  const allItems=[
+    ...S.transactions.map(t=>({...t,_kind:'tx'})),
+    ...(S.investments||[]).map(i=>({...i,type:'invest',_kind:'inv'}))
+  ].sort((a,b)=>b.id-a.id);
+
+  if(!allItems.length){tl.innerHTML='<div class="empty">Nenhuma transação</div>';return;}
   tl.innerHTML='';
-  [...S.transactions].reverse().forEach(t=>{
+  allItems.forEach(t=>{
     const cat=CATS.find(c=>c.id===t.cat);
     const bank=BANKS.find(b=>b.id===t.bank);
+    const isInvest=t._kind==='inv';
+    const icon=isInvest?'◈':t.type==='in'?'↑':'↓';
+    const valClass=isInvest?'':'fin-row-val '+(t.type==='in'?'val-in':'val-out');
+    const valSign=isInvest?'':t.type==='in'?'+':'−';
     const row=document.createElement('div');row.className='list-item';
-    row.dataset.tid=t.id;
     row.innerHTML=`
-      <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:rgba(255,255,255,${t.type==='in'?'0.07':'0.03'});color:rgba(255,255,255,${t.type==='in'?'0.7':'0.35'})">${t.type==='in'?'↑':'↓'}</div>
+      <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4)">${icon}</div>
       <div class="item-body">
-        <div class="item-name">${t.name}</div>
-        <div class="item-meta">${t.date}${cat?' · '+cat.name:''}${bank?' · <span style="color:'+bank.color+'">'+bank.name+'</span>':''}</div>
+        <div class="item-name">${t.name}${isInvest?'<span class="trans-invest-badge">invest</span>':''}</div>
+        <div class="item-meta">${t.date||''}${cat?' · '+cat.name:''}${bank?' · <span style="color:'+bank.color+'">'+bank.name+'</span>':''}${t.recur&&t.recur!=='once'?' · <span style="opacity:.4">'+recurLabel(t.recur)+'</span>':''}</div>
       </div>
-      <div class="fin-row-val ${t.type==='in'?'val-in':'val-out'}">${t.type==='in'?'+':'−'}R$ ${fmt(t.amount)}</div>
-      <button class="trans-del" title="Remover" onclick="deleteTransaction(${t.id})">×</button>`;
+      <div class="${valClass}" style="${isInvest?'font-family:var(--mono);font-size:13px;color:rgba(180,160,255,0.7)':''}">${valSign}R$ ${fmt(t.amount)}</div>
+      <button class="trans-del" title="Remover" onclick="deleteTransaction(${t.id},${isInvest})">×</button>`;
     tl.appendChild(row);
   });
 }
-function deleteTransaction(id){
-  const idx=S.transactions.findIndex(x=>x.id===id);
-  if(idx===-1)return;
-  S.transactions.splice(idx,1);
+function recurLabel(r){return{once:'',daily:'diário',weekly:'semanal',monthly:'mensal'}[r]||r;}
+function deleteTransaction(id,isInvest){
+  if(isInvest){
+    S.investments=(S.investments||[]).filter(x=>x.id!==id);
+  }else{
+    const idx=S.transactions.findIndex(x=>x.id===id);
+    if(idx===-1)return;
+    S.transactions.splice(idx,1);
+  }
   save();renderFinance(true);
 }
-function updateSaving(){
-  const v=parseFloat(document.getElementById('avail-input').value)||0;S.available=v;save();
+function updateAvail(){
+  const v=parseFloat(document.getElementById('fp-avail-input')?.value)||0;
+  S.available=v;save();
   const ins=S.transactions.filter(t=>t.type==='in').reduce((a,t)=>a+t.amount,0);
   const outs=S.transactions.filter(t=>t.type==='out').reduce((a,t)=>a+t.amount,0);
-  document.getElementById('saving-val').textContent='R$ '+fmt(Math.max(0,ins-outs-v));
+  const el=document.getElementById('fp-save');
+  if(el)el.textContent='R$ '+fmt(Math.max(0,ins-outs-v));
 }
 
 /* STATS */
@@ -1581,7 +1636,7 @@ function openModal(type,editId){
 
   }else{
     const isIn=type==='fin-in';
-    title.textContent=isIn?'Nova entrada':'Nova saída';
+    title.textContent=isIn?'nova entrada':'nova saída';
     const bankOpts=BANKS.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
     const catOpts=CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
     body.innerHTML=`
@@ -1592,10 +1647,18 @@ function openModal(type,editId){
         <input class="m-flat" id="m-amount" type="number" placeholder="Valor (R$)" min="0" step="0.01">
       </div>
       <div class="m-field">
-        <div class="m-field-label">Banco</div>
+        <div class="m-field-label">Banco / Corretora</div>
         <select class="m-flat" id="m-bank" style="appearance:none;cursor:pointer"><option value="">Selecionar…</option>${bankOpts}</select>
       </div>
       ${!isIn?`<div class="m-field"><div class="m-field-label">Categoria</div><select class="m-flat" id="m-cat" style="appearance:none;cursor:pointer"><option value="">Selecionar…</option>${catOpts}</select></div>`:''}
+      <div class="m-field">
+        <div class="m-field-label">Recorrência</div>
+        <div class="m-recur-row">
+          <button class="m-recur-pill sel" data-r="once" onclick="selectRecur(this)">uma vez</button>
+          <button class="m-recur-pill" data-r="weekly" onclick="selectRecur(this)">semanal</button>
+          <button class="m-recur-pill" data-r="monthly" onclick="selectRecur(this)">mensal</button>
+        </div>
+      </div>
       <button class="m-save" onclick="saveFinance('${isIn?'in':'out'}')">${isIn?'adicionar entrada':'registrar saída'}</button>`;
   }
   document.getElementById('modal-overlay').classList.add('open');
@@ -1680,15 +1743,20 @@ function saveTask(){
   else S.tasks.push({id:Date.now(),name,desc,tag,color:mColor,priority:prio,due,repeat:mRepeat,days:[...days],done:false});
   save();closeModal();renderTasks();renderTaskFilters();updateRing();
 }
+function toggleInvest(row){const sw=row.querySelector('.fin-invest-switch');sw.classList.toggle('on');}
+function selectRecur(el){
+  el.closest('.m-recur-row').querySelectorAll('.m-recur-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+}
 function saveFinance(type){
   const name=(document.getElementById('m-name').value||'').trim();
   const amount=parseFloat(document.getElementById('m-amount').value)||0;
   if(!name||!amount)return;
-  const bankEl=document.getElementById('m-bank');
-  const catEl=document.getElementById('m-cat');
-  const bank=bankEl?bankEl.value||'outro':'outro';
-  const cat=catEl?catEl.value||'outros':null;
-  S.transactions.push({id:Date.now(),name,amount,type,bank,cat,date:new Date().toLocaleDateString('pt-BR')});
+  const bank=(document.getElementById('m-bank')?.value)||'outro';
+  const cat=document.getElementById('m-cat')?.value||'outros';
+  const recurEl=document.querySelector('.m-recur-pill.sel');
+  const recur=recurEl?recurEl.dataset.r:'once';
+  S.transactions.push({id:Date.now(),name,amount,type,bank,cat,recur,date:new Date().toLocaleDateString('pt-BR')});
   save();closeModal();renderFinance(true);addXP(XP_F,null);showToast('+'+XP_F+' XP');updateRing();
 }
 document.addEventListener('keydown',e=>{
@@ -2161,7 +2229,7 @@ function initDrag(container){
 /* ── LOGOUT ── */
 async function doLogout(){
   closeDrawer();
-  S={habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''};
+  S={habits:[],tasks:[],transactions:[],investments:[],xp:0,streak:0,available:0,savings:0,lastDate:'',history:[],userName:''};
   currentUser=null;
   const appEl=document.getElementById('app');
   if(appEl){appEl.style.opacity='0';appEl.classList.remove('app-visible');}
@@ -2186,7 +2254,7 @@ async function fsLoad(uid){
   try{
     const snap=await getDoc(fsDoc(db,'users',uid));
     if(snap.exists()){
-      S=Object.assign({habits:[],tasks:[],transactions:[],xp:0,streak:0,available:0,lastDate:'',history:[],userName:''},snap.data());
+      S=Object.assign({habits:[],tasks:[],transactions:[],investments:[],xp:0,streak:0,available:0,savings:0,lastDate:'',history:[],userName:''},snap.data());
     }
   }catch(e){console.warn('fsLoad',e);}
 }
@@ -2340,8 +2408,8 @@ function bootApp(){
 Object.assign(window,{
   toggleDrawer,closeDrawer,setTab,openModal,closeModal,overlayClose,
   onFabClick,fabAction,updateFab,
-  saveHabit,saveTask,saveFinance,deleteItem,deleteTransaction,
-  selectPill,setPeriod,
+  saveHabit,saveTask,saveFinance,selectRecur,toggleInvest,deleteItem,deleteTransaction,
+  selectPill,setPeriod,updateAvail,
   updateUserName,hidNameInput,
   renderHabitFilters,renderTaskFilters,
 });
