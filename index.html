@@ -616,6 +616,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* google icon svg inline */
 .g-icon{width:18px;height:18px;flex-shrink:0;}
 </style>
+<style>
 #app{opacity:0;}
 #app.app-visible{opacity:1;transition:opacity 0.5s ease;}
 
@@ -2215,7 +2216,23 @@ function hideLoginScreen(){
 }
 
 /* ── AUTH STATE ── */
+// garantir que login screen apareça mesmo se Firebase demorar
+document.addEventListener('DOMContentLoaded',()=>{
+  const ls=document.getElementById('login-screen');
+  if(ls){ls.style.display='flex';ls.style.opacity='1';}
+});
+
+// fallback: se Firebase não responder em 6s, mostra login
+let authResolved=false;
+setTimeout(()=>{
+  if(!authResolved){
+    const ls=document.getElementById('login-screen');
+    if(ls){ls.classList.remove('out','gone');ls.style.display='flex';ls.style.opacity='1';}
+  }
+},6000);
+
 onAuthStateChanged(auth,async(user)=>{
+  authResolved=true;
   if(!user){
     const ls=document.getElementById('login-screen');
     const is=document.getElementById('intro-screen');
