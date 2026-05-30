@@ -2254,14 +2254,18 @@ onAuthStateChanged(auth,async(user)=>{
 
 /* ── BOOT APP (after auth) ── */
 function bootApp(){
-  updateGreeting();updateXPBar();updateRing();
-  renderDashboard();renderHabitFilters();renderTaskFilters();snapshotHistory();
+  // pequeno delay para garantir que o DOM está pronto no mobile
+  setTimeout(()=>{
+    try{
+      updateGreeting();updateXPBar();updateRing();
+      renderDashboard();renderHabitFilters();renderTaskFilters();snapshotHistory();
+    }catch(e){console.warn('bootApp render error',e);}
 
-  const scr=document.getElementById('intro-screen');
-  const greetEl=document.getElementById('intro-greeting');
-  const nameEl=document.getElementById('intro-name');
-  const logoEl=document.getElementById('intro-logo');
-  const appEl=document.getElementById('app');
+    const scr=document.getElementById('intro-screen');
+    const greetEl=document.getElementById('intro-greeting');
+    const nameEl=document.getElementById('intro-name');
+    const logoEl=document.getElementById('intro-logo');
+    const appEl=document.getElementById('app');
 
   const h=new Date().getHours();
   const word=h<12?'bom dia':h<18?'boa tarde':'boa noite';
@@ -2295,6 +2299,7 @@ function bootApp(){
         setTimeout(()=>{
           scr.classList.add('out');
           appEl.classList.add('app-visible');
+          appEl.style.opacity='1';
           const fabW=document.getElementById('fab-wrap');
           if(fabW){fabW.style.display='';updateFab();}
           setTimeout(()=>scr.classList.add('gone'),580);
@@ -2303,6 +2308,7 @@ function bootApp(){
     }
     type();
   },200);
+  },100); // delay mobile safe
 }
 
 /* ── EXPOSE GLOBALS (required for type=module) ── */
